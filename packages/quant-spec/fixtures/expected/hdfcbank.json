@@ -1,0 +1,544 @@
+{
+ "symbol": "HDFCBANK",
+ "name": "HDFC Bank",
+ "sector": "Banking",
+ "as_of": "2026-10-05",
+ "total_score": 77.29,
+ "max_score": 100,
+ "confidence": "HIGH",
+ "data_coverage": 1.0,
+ "risk_level": "LOW",
+ "risk_points": 1,
+ "risk_flags": [
+  {
+   "code": "OVEREXTENDED",
+   "severity": "ELEVATED",
+   "points": 1,
+   "message": "Price 53.3% above its 200 DMA"
+  }
+ ],
+ "key_reason": "Technical Trend + Earnings Growth + Momentum",
+ "top_positives": [
+  {
+   "component": "earningsGrowth",
+   "metric": "eps_cagr_3y",
+   "text": "EPS CAGR (3Y): 20.7%",
+   "impact": 3.0
+  },
+  {
+   "component": "fundamentals",
+   "metric": "earnings_consistency",
+   "text": "Earnings consistency (last 8 quarters with YoY EPS growth): 100%",
+   "impact": 2.78
+  },
+  {
+   "component": "liquidity",
+   "metric": "avg_traded_value_cr",
+   "text": "Avg traded value (20D): ₹3,307 Cr",
+   "impact": 2.5
+  },
+  {
+   "component": "earningsGrowth",
+   "metric": "revenue_growth_yoy",
+   "text": "Revenue growth (YoY): 17.5%",
+   "impact": 1.5
+  },
+  {
+   "component": "fundamentals",
+   "metric": "promoter_pledge",
+   "text": "Promoter pledge: 0.0%",
+   "impact": 1.39
+  }
+ ],
+ "top_negatives": [
+  {
+   "component": "fundamentals",
+   "metric": "roe",
+   "text": "ROE: 11.9%",
+   "impact": -1.82
+  },
+  {
+   "component": "sectorStrength",
+   "metric": "sector_strength",
+   "text": "Sector strength: 36/100",
+   "impact": -0.7
+  },
+  {
+   "component": "technicalTrend",
+   "metric": "macd_hist_positive",
+   "text": "MACD above signal: No",
+   "impact": -0.62
+  },
+  {
+   "component": "momentum",
+   "metric": "momentum_acceleration",
+   "text": "Momentum acceleration (1M − 3M/3): -21.1 pp",
+   "impact": -0.62
+  },
+  {
+   "component": "momentum",
+   "metric": "ret_1m",
+   "text": "1M return: -5.0%",
+   "impact": -0.62
+  },
+  {
+   "component": "risk",
+   "metric": "OVEREXTENDED",
+   "text": "Price 53.3% above its 200 DMA",
+   "impact": -1.0
+  }
+ ],
+ "components": {
+  "fundamentals": {
+   "key": "fundamentals",
+   "label": "Fundamental Quality",
+   "weight": 25,
+   "max": 25,
+   "normalized_score": 0.598,
+   "score": 14.94,
+   "coverage": 1.0,
+   "raw_metrics": {
+    "roe": 11.95,
+    "net_margin": 15.54,
+    "cfo_to_pat": 0.734,
+    "promoter_pledge": 0.0,
+    "earnings_consistency": 1.0
+   },
+   "metric_scores": {
+    "roe": 0.282,
+    "net_margin": 0.752,
+    "cfo_to_pat": 0.39,
+    "promoter_pledge": 1.0,
+    "earnings_consistency": 1.0
+   },
+   "reasons": [
+    {
+     "text": "Earnings consistency (last 8 quarters with YoY EPS growth): 100%",
+     "impact": "positive",
+     "metric": "earnings_consistency",
+     "points": 2.78
+    },
+    {
+     "text": "ROE: 11.9%",
+     "impact": "negative",
+     "metric": "roe",
+     "points": -1.82
+    },
+    {
+     "text": "Promoter pledge: 0.0%",
+     "impact": "positive",
+     "metric": "promoter_pledge",
+     "points": 1.39
+    },
+    {
+     "text": "Net margin: 15.5%",
+     "impact": "positive",
+     "metric": "net_margin",
+     "points": 0.7
+    },
+    {
+     "text": "Cash-flow quality (CFO / PAT): 0.73x",
+     "impact": "neutral",
+     "metric": "cfo_to_pat",
+     "points": -0.61
+    }
+   ],
+   "data_timestamp": "2026-10-05"
+  },
+  "earningsGrowth": {
+   "key": "earningsGrowth",
+   "label": "Earnings Growth",
+   "weight": 20,
+   "max": 20,
+   "normalized_score": 0.869,
+   "score": 17.39,
+   "coverage": 1.0,
+   "raw_metrics": {
+    "revenue_growth_yoy": 17.5,
+    "profit_growth_yoy": 19.76,
+    "eps_growth_yoy": 20.0,
+    "eps_cagr_3y": 20.66,
+    "ttm_eps_growth": 19.0908
+   },
+   "metric_scores": {
+    "revenue_growth_yoy": 0.875,
+    "profit_growth_yoy": 0.79,
+    "eps_growth_yoy": 0.8,
+    "eps_cagr_3y": 1.0,
+    "ttm_eps_growth": 0.764
+   },
+   "reasons": [
+    {
+     "text": "EPS CAGR (3Y): 20.7%",
+     "impact": "positive",
+     "metric": "eps_cagr_3y",
+     "points": 3.0
+    },
+    {
+     "text": "Revenue growth (YoY): 17.5%",
+     "impact": "positive",
+     "metric": "revenue_growth_yoy",
+     "points": 1.5
+    },
+    {
+     "text": "EPS growth (YoY): 20.0%",
+     "impact": "positive",
+     "metric": "eps_growth_yoy",
+     "points": 1.2
+    },
+    {
+     "text": "Profit growth (YoY): 19.8%",
+     "impact": "positive",
+     "metric": "profit_growth_yoy",
+     "points": 1.16
+    },
+    {
+     "text": "TTM EPS growth (last 4Q vs prior 4Q): 19.1%",
+     "impact": "positive",
+     "metric": "ttm_eps_growth",
+     "points": 0.53
+    }
+   ],
+   "data_timestamp": "2026-10-05"
+  },
+  "momentum": {
+   "key": "momentum",
+   "label": "Momentum",
+   "weight": 15,
+   "max": 15,
+   "normalized_score": 0.831,
+   "score": 12.47,
+   "coverage": 1.0,
+   "raw_metrics": {
+    "ret_1m": -5.0133,
+    "ret_3m": 48.1559,
+    "ret_6m": 83.2293,
+    "ret_1y": 145.0986,
+    "rs_nifty_3m": 31.6094,
+    "rs_nifty_6m": 51.2867,
+    "up_down_volume_ratio": 1.4817,
+    "momentum_acceleration": -21.0653
+   },
+   "metric_scores": {
+    "ret_1m": 0.0,
+    "ret_3m": 1.0,
+    "ret_6m": 1.0,
+    "ret_1y": 1.0,
+    "rs_nifty_3m": 1.0,
+    "rs_nifty_6m": 1.0,
+    "up_down_volume_ratio": 0.974,
+    "momentum_acceleration": 0.0
+   },
+   "reasons": [
+    {
+     "text": "3M return: 48.2%",
+     "impact": "positive",
+     "metric": "ret_3m",
+     "points": 1.25
+    },
+    {
+     "text": "6M return: 83.2%",
+     "impact": "positive",
+     "metric": "ret_6m",
+     "points": 1.25
+    },
+    {
+     "text": "Relative strength vs NIFTY 50 (3M): +31.6 pp",
+     "impact": "positive",
+     "metric": "rs_nifty_3m",
+     "points": 1.25
+    },
+    {
+     "text": "Relative strength vs NIFTY 50 (6M): +51.3 pp",
+     "impact": "positive",
+     "metric": "rs_nifty_6m",
+     "points": 1.25
+    },
+    {
+     "text": "Momentum acceleration (1M − 3M/3): -21.1 pp",
+     "impact": "negative",
+     "metric": "momentum_acceleration",
+     "points": -0.62
+    },
+    {
+     "text": "1M return: -5.0%",
+     "impact": "negative",
+     "metric": "ret_1m",
+     "points": -0.62
+    },
+    {
+     "text": "1Y return: 145.1%",
+     "impact": "positive",
+     "metric": "ret_1y",
+     "points": 0.62
+    },
+    {
+     "text": "Volume confirmation (up-day / down-day volume, 50D): 1.48x",
+     "impact": "positive",
+     "metric": "up_down_volume_ratio",
+     "points": 0.59
+    }
+   ],
+   "data_timestamp": "2026-10-05"
+  },
+  "technicalTrend": {
+   "key": "technicalTrend",
+   "label": "Technical Trend",
+   "weight": 15,
+   "max": 15,
+   "normalized_score": 0.899,
+   "score": 13.49,
+   "coverage": 1.0,
+   "raw_metrics": {
+    "above_sma50": true,
+    "above_sma200": true,
+    "sma50_above_sma200": true,
+    "sma200_slope_20d": 10.6937,
+    "directional_adx": 43.4081,
+    "rsi14": 50.9906,
+    "macd_hist_positive": false,
+    "dist_from_52w_high": -8.7181
+   },
+   "metric_scores": {
+    "above_sma50": 1.0,
+    "above_sma200": 1.0,
+    "sma50_above_sma200": 1.0,
+    "sma200_slope_20d": 1.0,
+    "directional_adx": 1.0,
+    "rsi14": 1.0,
+    "macd_hist_positive": 0.0,
+    "dist_from_52w_high": 0.788
+   },
+   "reasons": [
+    {
+     "text": "Price above 200 DMA: Yes",
+     "impact": "positive",
+     "metric": "above_sma200",
+     "points": 1.25
+    },
+    {
+     "text": "Price above 50 DMA: Yes",
+     "impact": "positive",
+     "metric": "above_sma50",
+     "points": 1.25
+    },
+    {
+     "text": "200 DMA slope (20 sessions): 10.7%",
+     "impact": "positive",
+     "metric": "sma200_slope_20d",
+     "points": 1.25
+    },
+    {
+     "text": "50 DMA above 200 DMA: Yes",
+     "impact": "positive",
+     "metric": "sma50_above_sma200",
+     "points": 1.25
+    },
+    {
+     "text": "Trend strength (ADX, when +DI > −DI): 43.4",
+     "impact": "positive",
+     "metric": "directional_adx",
+     "points": 0.62
+    },
+    {
+     "text": "MACD above signal: No",
+     "impact": "negative",
+     "metric": "macd_hist_positive",
+     "points": -0.62
+    },
+    {
+     "text": "RSI(14) in healthy range: 51.0",
+     "impact": "positive",
+     "metric": "rsi14",
+     "points": 0.62
+    },
+    {
+     "text": "Distance from 52-week high: -8.7%",
+     "impact": "positive",
+     "metric": "dist_from_52w_high",
+     "points": 0.36
+    }
+   ],
+   "data_timestamp": "2026-10-05"
+  },
+  "valuation": {
+   "key": "valuation",
+   "label": "Valuation",
+   "weight": 10,
+   "max": 10,
+   "normalized_score": 0.77,
+   "score": 7.7,
+   "coverage": 1.0,
+   "raw_metrics": {
+    "pe_vs_sector": 0.9276,
+    "pe_vs_history": 0.9368,
+    "peg": 0.689,
+    "pb_vs_sector": 0.9632,
+    "dividend_yield": 0.81
+   },
+   "metric_scores": {
+    "pe_vs_sector": 0.747,
+    "pe_vs_history": 0.772,
+    "peg": 1.0,
+    "pb_vs_sector": 0.708,
+    "dividend_yield": 0.27
+   },
+   "reasons": [
+    {
+     "text": "PEG ratio: 0.69x",
+     "impact": "positive",
+     "metric": "peg",
+     "points": 1.36
+    },
+    {
+     "text": "PE relative to sector median: 0.93x",
+     "impact": "positive",
+     "metric": "pe_vs_sector",
+     "points": 0.67
+    },
+    {
+     "text": "PE relative to own 5Y median: 0.94x",
+     "impact": "positive",
+     "metric": "pe_vs_history",
+     "points": 0.49
+    },
+    {
+     "text": "PB relative to sector median: 0.96x",
+     "impact": "positive",
+     "metric": "pb_vs_sector",
+     "points": 0.38
+    },
+    {
+     "text": "Dividend yield: 0.8%",
+     "impact": "negative",
+     "metric": "dividend_yield",
+     "points": -0.21
+    }
+   ],
+   "data_timestamp": "2026-10-05"
+  },
+  "liquidity": {
+   "key": "liquidity",
+   "label": "Liquidity",
+   "weight": 5,
+   "max": 5,
+   "normalized_score": 1.0,
+   "score": 5.0,
+   "coverage": 1.0,
+   "raw_metrics": {
+    "avg_traded_value_cr": 3307.335
+   },
+   "metric_scores": {
+    "avg_traded_value_cr": 1.0
+   },
+   "reasons": [
+    {
+     "text": "Avg traded value (20D): ₹3,307 Cr",
+     "impact": "positive",
+     "metric": "avg_traded_value_cr",
+     "points": 2.5
+    }
+   ],
+   "data_timestamp": "2026-10-05"
+  },
+  "sectorStrength": {
+   "key": "sectorStrength",
+   "label": "Sector Strength",
+   "weight": 5,
+   "max": 5,
+   "normalized_score": 0.361,
+   "score": 1.8,
+   "coverage": 1.0,
+   "raw_metrics": {
+    "sector_strength": 0.3606
+   },
+   "metric_scores": {
+    "sector_strength": 0.361
+   },
+   "reasons": [
+    {
+     "text": "Sector strength: 36/100",
+     "impact": "neutral",
+     "metric": "sector_strength",
+     "points": -0.7
+    }
+   ],
+   "data_timestamp": "2026-10-05"
+  },
+  "risk": {
+   "key": "risk",
+   "label": "Risk",
+   "weight": 5,
+   "max": 5,
+   "normalized_score": 0.9,
+   "score": 4.5,
+   "coverage": 1.0,
+   "raw_metrics": {
+    "risk_points": 1
+   },
+   "metric_scores": {
+    "risk_points": 0.9
+   },
+   "reasons": [
+    {
+     "text": "Risk penalty points: 1",
+     "impact": "positive",
+     "metric": "risk_points",
+     "points": 2.0
+    }
+   ],
+   "data_timestamp": "2026-10-05"
+  }
+ },
+ "technicals": {
+  "close": 7006.56,
+  "prev_close": 7204.47,
+  "change": -197.91,
+  "change_pct": -2.747,
+  "sma20": 7048.1075,
+  "sma50": 6627.649,
+  "sma100": 5591.9405,
+  "sma200": 4570.2348,
+  "ema20": 7075.7222,
+  "rsi14": 50.9906,
+  "macd": 155.8804,
+  "macd_signal": 196.049,
+  "macd_hist": -40.1686,
+  "adx14": 43.4081,
+  "plus_di": 25.7249,
+  "minus_di": 19.4563,
+  "atr14": 188.0832,
+  "atr_pct": 2.6844,
+  "bb_upper": 7460.5247,
+  "bb_lower": 6635.6903,
+  "high_52w": 7675.74,
+  "low_52w": 2443.03,
+  "dist_from_52w_high": -8.7181,
+  "dist_from_sma50": 5.7171,
+  "dist_from_sma200": 53.3085,
+  "sma200_slope_20d": 10.6937,
+  "volume": 3947183.0,
+  "volume_sma20": 4690875.75,
+  "volume_sma50": 5316594.28,
+  "relative_volume": 0.8415,
+  "avg_traded_value_cr": 3307.335,
+  "up_down_volume_ratio": 1.4817,
+  "ret_1d": -2.747,
+  "ret_1w": -4.1724,
+  "ret_1m": -5.0133,
+  "ret_3m": 48.1559,
+  "ret_6m": 83.2293,
+  "ret_1y": 145.0986,
+  "rs_nifty_1m": -5.6163,
+  "rs_nifty_3m": 31.6094,
+  "rs_nifty_6m": 51.2867,
+  "volatility_60d": 30.8921,
+  "max_drawdown_1y": -13.8558,
+  "gap_moves_60d": 0,
+  "trend": "STRONG_UPTREND",
+  "bars": 300
+ },
+ "rank": 9,
+ "data_provenance": "MOCK",
+ "config_version": "2026.10-v1"
+}

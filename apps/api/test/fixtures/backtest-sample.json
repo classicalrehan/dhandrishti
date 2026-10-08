@@ -1,0 +1,1139 @@
+{
+ "params": {
+  "start": "2025-09-01",
+  "end": "2026-03-31",
+  "rebalance": "quarterly",
+  "top_n": 5,
+  "max_risk": "MEDIUM",
+  "min_confidence": null,
+  "buy_cost_bps": 15.0,
+  "sell_cost_bps": 13.5,
+  "initial_capital": 1000000.0,
+  "risk_free_rate": 0.0,
+  "lookback_bars": 300,
+  "quantiles": 5
+ },
+ "config_version": "2026.10-v1",
+ "data_provenance": "MOCK",
+ "metrics": {
+  "period": {
+   "start": "2025-10-01",
+   "end": "2026-03-30",
+   "rebalances": 2
+  },
+  "strategy": {
+   "total_return_pct": 20.6934,
+   "cagr_pct": 46.4703,
+   "volatility_pct": 15.1931,
+   "sharpe": 2.5729,
+   "sortino": 2.6343,
+   "max_drawdown_pct": -7.4606,
+   "max_drawdown_peak": "2025-10-07",
+   "max_drawdown_trough": "2025-10-17",
+   "calmar": 6.2287
+  },
+  "nifty": {
+   "total_return_pct": 10.9776,
+   "cagr_pct": 23.535,
+   "volatility_pct": 12.4347,
+   "sharpe": 1.751,
+   "sortino": 1.8588,
+   "max_drawdown_pct": -5.0219,
+   "max_drawdown_peak": "2026-01-16",
+   "max_drawdown_trough": "2026-02-09",
+   "calmar": 4.6865
+  },
+  "universe_ew": {
+   "total_return_pct": 7.9752,
+   "cagr_pct": 16.8476,
+   "volatility_pct": 13.3673,
+   "sharpe": 1.2238,
+   "sortino": 1.3598,
+   "max_drawdown_pct": -6.9103,
+   "max_drawdown_peak": "2025-10-07",
+   "max_drawdown_trough": "2025-10-21",
+   "calmar": 2.438
+  },
+  "vs_nifty": {
+   "excess_cagr_pct": 22.9354,
+   "beta": 0.8351,
+   "tracking_error_pct": 11.2782,
+   "information_ratio": 1.5354,
+   "periods_beaten_pct": 100.0
+  },
+  "vs_universe": {
+   "excess_cagr_pct": 29.6227,
+   "beta": 0.8244,
+   "tracking_error_pct": 10.7192,
+   "information_ratio": 2.1206,
+   "periods_beaten_pct": 100.0
+  },
+  "trading": {
+   "avg_holdings": 5.0,
+   "avg_turnover_pct": 40.8035,
+   "total_costs": 2864.812,
+   "costs_pct_of_capital": 0.2865
+  },
+  "signal": {
+   "mean_ic": 0.1184,
+   "ic_t_stat": 0.9871,
+   "positive_ic_pct": 50.0,
+   "top_minus_bottom_pct": 10.3527,
+   "quantile_mean_returns_pct": [
+    0.0415,
+    7.132,
+    3.9682,
+    2.9222,
+    10.3942
+   ]
+  }
+ },
+ "periods": [
+  {
+   "signal": "2025-09-30",
+   "execution": "2025-10-01",
+   "regime": "BULLISH",
+   "picks": [
+    "ASIANPAINT",
+    "MARUTI",
+    "SUNPHARMA",
+    "TCS",
+    "LT"
+   ],
+   "turnover_pct": 50.0,
+   "end": "2026-01-01",
+   "strategy_return_pct": 17.539,
+   "universe_return_pct": 8.3327,
+   "nifty_return_pct": 9.4436,
+   "ic": 0.2383,
+   "quantile_returns_pct": [
+    2.1357,
+    10.1742,
+    6.44,
+    7.9124,
+    15.835
+   ]
+  },
+  {
+   "signal": "2025-12-31",
+   "execution": "2026-01-01",
+   "regime": "BULLISH",
+   "picks": [
+    "TCS",
+    "MARUTI",
+    "ASIANPAINT",
+    "HDFCBANK",
+    "HINDUNILVR"
+   ],
+   "turnover_pct": 40.8035,
+   "end": "2026-03-30",
+   "strategy_return_pct": 4.1947,
+   "universe_return_pct": 1.2004,
+   "nifty_return_pct": 2.7809,
+   "ic": -0.0016,
+   "quantile_returns_pct": [
+    -2.0528,
+    4.0898,
+    1.4964,
+    -2.0679,
+    4.9535
+   ]
+  }
+ ],
+ "holdings": [
+  {
+   "signal": "2025-09-30",
+   "execution": "2025-10-01",
+   "symbol": "ASIANPAINT",
+   "rank": 1,
+   "total_score": 86.09,
+   "risk_level": "LOW",
+   "confidence": "HIGH",
+   "weight": 0.2,
+   "entry_price": 2162.09
+  },
+  {
+   "signal": "2025-09-30",
+   "execution": "2025-10-01",
+   "symbol": "MARUTI",
+   "rank": 2,
+   "total_score": 82.14,
+   "risk_level": "LOW",
+   "confidence": "HIGH",
+   "weight": 0.2,
+   "entry_price": 3051.65
+  },
+  {
+   "signal": "2025-09-30",
+   "execution": "2025-10-01",
+   "symbol": "SUNPHARMA",
+   "rank": 3,
+   "total_score": 81.79,
+   "risk_level": "LOW",
+   "confidence": "HIGH",
+   "weight": 0.2,
+   "entry_price": 845.91
+  },
+  {
+   "signal": "2025-09-30",
+   "execution": "2025-10-01",
+   "symbol": "TCS",
+   "rank": 4,
+   "total_score": 78.64,
+   "risk_level": "LOW",
+   "confidence": "HIGH",
+   "weight": 0.2,
+   "entry_price": 2137.33
+  },
+  {
+   "signal": "2025-09-30",
+   "execution": "2025-10-01",
+   "symbol": "LT",
+   "rank": 5,
+   "total_score": 77.78,
+   "risk_level": "LOW",
+   "confidence": "HIGH",
+   "weight": 0.2,
+   "entry_price": 3035.56
+  },
+  {
+   "signal": "2025-12-31",
+   "execution": "2026-01-01",
+   "symbol": "TCS",
+   "rank": 1,
+   "total_score": 87.74,
+   "risk_level": "LOW",
+   "confidence": "HIGH",
+   "weight": 0.2,
+   "entry_price": 2667.76
+  },
+  {
+   "signal": "2025-12-31",
+   "execution": "2026-01-01",
+   "symbol": "MARUTI",
+   "rank": 2,
+   "total_score": 85.08,
+   "risk_level": "LOW",
+   "confidence": "HIGH",
+   "weight": 0.2,
+   "entry_price": 3442.77
+  },
+  {
+   "signal": "2025-12-31",
+   "execution": "2026-01-01",
+   "symbol": "ASIANPAINT",
+   "rank": 3,
+   "total_score": 83.17,
+   "risk_level": "LOW",
+   "confidence": "HIGH",
+   "weight": 0.2,
+   "entry_price": 2565.7
+  },
+  {
+   "signal": "2025-12-31",
+   "execution": "2026-01-01",
+   "symbol": "HDFCBANK",
+   "rank": 4,
+   "total_score": 82.67,
+   "risk_level": "LOW",
+   "confidence": "HIGH",
+   "weight": 0.2,
+   "entry_price": 3168.73
+  },
+  {
+   "signal": "2025-12-31",
+   "execution": "2026-01-01",
+   "symbol": "HINDUNILVR",
+   "rank": 5,
+   "total_score": 81.85,
+   "risk_level": "LOW",
+   "confidence": "HIGH",
+   "weight": 0.2,
+   "entry_price": 676.88
+  }
+ ],
+ "equity": [
+  {
+   "date": "2025-10-01",
+   "strategy": 1012014.83,
+   "nifty": 1013602.55,
+   "universe_ew": 1013681.83,
+   "drawdown_pct": 0.0
+  },
+  {
+   "date": "2025-10-02",
+   "strategy": 1014805.86,
+   "nifty": 1015013.13,
+   "universe_ew": 1017106.24,
+   "drawdown_pct": 0.0
+  },
+  {
+   "date": "2025-10-03",
+   "strategy": 1024161.86,
+   "nifty": 1023536.72,
+   "universe_ew": 1027637.68,
+   "drawdown_pct": 0.0
+  },
+  {
+   "date": "2025-10-06",
+   "strategy": 1029941.64,
+   "nifty": 1030038.98,
+   "universe_ew": 1034362.74,
+   "drawdown_pct": 0.0
+  },
+  {
+   "date": "2025-10-07",
+   "strategy": 1038146.72,
+   "nifty": 1032911.48,
+   "universe_ew": 1038480.29,
+   "drawdown_pct": 0.0
+  },
+  {
+   "date": "2025-10-08",
+   "strategy": 1025339.72,
+   "nifty": 1026873.41,
+   "universe_ew": 1030786.97,
+   "drawdown_pct": -1.2336
+  },
+  {
+   "date": "2025-10-09",
+   "strategy": 1004989.13,
+   "nifty": 1013142.74,
+   "universe_ew": 1015794.81,
+   "drawdown_pct": -3.1939
+  },
+  {
+   "date": "2025-10-10",
+   "strategy": 1004548.66,
+   "nifty": 1011951.1,
+   "universe_ew": 1012844.5,
+   "drawdown_pct": -3.2363
+  },
+  {
+   "date": "2025-10-13",
+   "strategy": 999325.61,
+   "nifty": 1002899.7,
+   "universe_ew": 1002310.88,
+   "drawdown_pct": -3.7395
+  },
+  {
+   "date": "2025-10-14",
+   "strategy": 994330.81,
+   "nifty": 1007481.56,
+   "universe_ew": 1006140.35,
+   "drawdown_pct": -4.2206
+  },
+  {
+   "date": "2025-10-15",
+   "strategy": 984906.76,
+   "nifty": 994957.01,
+   "universe_ew": 991523.4,
+   "drawdown_pct": -5.1284
+  },
+  {
+   "date": "2025-10-16",
+   "strategy": 973436.36,
+   "nifty": 989439.74,
+   "universe_ew": 980668.03,
+   "drawdown_pct": -6.2333
+  },
+  {
+   "date": "2025-10-17",
+   "strategy": 960694.49,
+   "nifty": 981399.22,
+   "universe_ew": 971592.56,
+   "drawdown_pct": -7.4606
+  },
+  {
+   "date": "2025-10-20",
+   "strategy": 968092.16,
+   "nifty": 982209.59,
+   "universe_ew": 970507.52,
+   "drawdown_pct": -6.748
+  },
+  {
+   "date": "2025-10-21",
+   "strategy": 972489.59,
+   "nifty": 982515.39,
+   "universe_ew": 966717.71,
+   "drawdown_pct": -6.3245
+  },
+  {
+   "date": "2025-10-22",
+   "strategy": 983286.6,
+   "nifty": 991021.87,
+   "universe_ew": 975253.88,
+   "drawdown_pct": -5.2844
+  },
+  {
+   "date": "2025-10-23",
+   "strategy": 985124.22,
+   "nifty": 995239.13,
+   "universe_ew": 978171.54,
+   "drawdown_pct": -5.1074
+  },
+  {
+   "date": "2025-10-24",
+   "strategy": 977654.51,
+   "nifty": 990631.82,
+   "universe_ew": 967970.03,
+   "drawdown_pct": -5.8269
+  },
+  {
+   "date": "2025-10-27",
+   "strategy": 990544.85,
+   "nifty": 1002555.28,
+   "universe_ew": 979667.6,
+   "drawdown_pct": -4.5853
+  },
+  {
+   "date": "2025-10-28",
+   "strategy": 1003957.57,
+   "nifty": 1015912.57,
+   "universe_ew": 991632.55,
+   "drawdown_pct": -3.2933
+  },
+  {
+   "date": "2025-10-29",
+   "strategy": 1013068.25,
+   "nifty": 1016837.45,
+   "universe_ew": 994122.97,
+   "drawdown_pct": -2.4157
+  },
+  {
+   "date": "2025-10-30",
+   "strategy": 994201.24,
+   "nifty": 997753.6,
+   "universe_ew": 974559.4,
+   "drawdown_pct": -4.2331
+  },
+  {
+   "date": "2025-10-31",
+   "strategy": 1006245.94,
+   "nifty": 1001813.79,
+   "universe_ew": 981034.25,
+   "drawdown_pct": -3.0729
+  },
+  {
+   "date": "2025-11-03",
+   "strategy": 1026258.62,
+   "nifty": 1016518.92,
+   "universe_ew": 997086.46,
+   "drawdown_pct": -1.1451
+  },
+  {
+   "date": "2025-11-04",
+   "strategy": 1031662.43,
+   "nifty": 1013689.86,
+   "universe_ew": 991139.13,
+   "drawdown_pct": -0.6246
+  },
+  {
+   "date": "2025-11-05",
+   "strategy": 1028451.24,
+   "nifty": 1006278.07,
+   "universe_ew": 985533.79,
+   "drawdown_pct": -0.9339
+  },
+  {
+   "date": "2025-11-06",
+   "strategy": 1031347.45,
+   "nifty": 1015665.99,
+   "universe_ew": 994684.39,
+   "drawdown_pct": -0.6549
+  },
+  {
+   "date": "2025-11-07",
+   "strategy": 1039826.36,
+   "nifty": 1020050.85,
+   "universe_ew": 993806.97,
+   "drawdown_pct": 0.0
+  },
+  {
+   "date": "2025-11-10",
+   "strategy": 1059819.57,
+   "nifty": 1029207.99,
+   "universe_ew": 1004648.43,
+   "drawdown_pct": 0.0
+  },
+  {
+   "date": "2025-11-11",
+   "strategy": 1068027.97,
+   "nifty": 1028000.11,
+   "universe_ew": 1001512.63,
+   "drawdown_pct": 0.0
+  },
+  {
+   "date": "2025-11-12",
+   "strategy": 1075729.08,
+   "nifty": 1026663.24,
+   "universe_ew": 998180.23,
+   "drawdown_pct": 0.0
+  },
+  {
+   "date": "2025-11-13",
+   "strategy": 1066565.59,
+   "nifty": 1022834.72,
+   "universe_ew": 994637.99,
+   "drawdown_pct": -0.8518
+  },
+  {
+   "date": "2025-11-14",
+   "strategy": 1075897.66,
+   "nifty": 1030345.23,
+   "universe_ew": 1004192.75,
+   "drawdown_pct": 0.0
+  },
+  {
+   "date": "2025-11-17",
+   "strategy": 1082412.68,
+   "nifty": 1040235.96,
+   "universe_ew": 1015491.14,
+   "drawdown_pct": 0.0
+  },
+  {
+   "date": "2025-11-18",
+   "strategy": 1087532.83,
+   "nifty": 1048674.43,
+   "universe_ew": 1023609.41,
+   "drawdown_pct": 0.0
+  },
+  {
+   "date": "2025-11-19",
+   "strategy": 1083846.73,
+   "nifty": 1044841.51,
+   "universe_ew": 1019812.92,
+   "drawdown_pct": -0.3389
+  },
+  {
+   "date": "2025-11-20",
+   "strategy": 1078852.25,
+   "nifty": 1043283.95,
+   "universe_ew": 1017729.7,
+   "drawdown_pct": -0.7982
+  },
+  {
+   "date": "2025-11-21",
+   "strategy": 1077142.04,
+   "nifty": 1038940.77,
+   "universe_ew": 1015202.21,
+   "drawdown_pct": -0.9554
+  },
+  {
+   "date": "2025-11-24",
+   "strategy": 1087522.07,
+   "nifty": 1046325.8,
+   "universe_ew": 1023730.99,
+   "drawdown_pct": -0.001
+  },
+  {
+   "date": "2025-11-25",
+   "strategy": 1089213.18,
+   "nifty": 1047619.67,
+   "universe_ew": 1026528.27,
+   "drawdown_pct": 0.0
+  },
+  {
+   "date": "2025-11-26",
+   "strategy": 1098514.58,
+   "nifty": 1051746.99,
+   "universe_ew": 1029440.55,
+   "drawdown_pct": 0.0
+  },
+  {
+   "date": "2025-11-27",
+   "strategy": 1099709.13,
+   "nifty": 1057477.94,
+   "universe_ew": 1034040.83,
+   "drawdown_pct": 0.0
+  },
+  {
+   "date": "2025-11-28",
+   "strategy": 1086431.41,
+   "nifty": 1064382.98,
+   "universe_ew": 1035108.85,
+   "drawdown_pct": -1.2074
+  },
+  {
+   "date": "2025-12-01",
+   "strategy": 1078413.75,
+   "nifty": 1065355.24,
+   "universe_ew": 1034904.36,
+   "drawdown_pct": -1.9365
+  },
+  {
+   "date": "2025-12-02",
+   "strategy": 1073295.79,
+   "nifty": 1061639.48,
+   "universe_ew": 1033383.41,
+   "drawdown_pct": -2.4018
+  },
+  {
+   "date": "2025-12-03",
+   "strategy": 1078717.52,
+   "nifty": 1075487.72,
+   "universe_ew": 1045396.6,
+   "drawdown_pct": -1.9088
+  },
+  {
+   "date": "2025-12-04",
+   "strategy": 1073186.56,
+   "nifty": 1068111.47,
+   "universe_ew": 1038046.29,
+   "drawdown_pct": -2.4118
+  },
+  {
+   "date": "2025-12-05",
+   "strategy": 1064561.89,
+   "nifty": 1065099.01,
+   "universe_ew": 1035798.6,
+   "drawdown_pct": -3.196
+  },
+  {
+   "date": "2025-12-08",
+   "strategy": 1076177.84,
+   "nifty": 1078660.32,
+   "universe_ew": 1049626.41,
+   "drawdown_pct": -2.1398
+  },
+  {
+   "date": "2025-12-09",
+   "strategy": 1083188.91,
+   "nifty": 1075086.27,
+   "universe_ew": 1044551.8,
+   "drawdown_pct": -1.5022
+  },
+  {
+   "date": "2025-12-10",
+   "strategy": 1095905.87,
+   "nifty": 1076782.91,
+   "universe_ew": 1049893.37,
+   "drawdown_pct": -0.3458
+  },
+  {
+   "date": "2025-12-11",
+   "strategy": 1099611.05,
+   "nifty": 1074516.33,
+   "universe_ew": 1049953.63,
+   "drawdown_pct": -0.0089
+  },
+  {
+   "date": "2025-12-12",
+   "strategy": 1098576.55,
+   "nifty": 1076442.88,
+   "universe_ew": 1049840.9,
+   "drawdown_pct": -0.103
+  },
+  {
+   "date": "2025-12-15",
+   "strategy": 1116803.48,
+   "nifty": 1096043.14,
+   "universe_ew": 1067258.84,
+   "drawdown_pct": 0.0
+  },
+  {
+   "date": "2025-12-16",
+   "strategy": 1120405.51,
+   "nifty": 1096854.82,
+   "universe_ew": 1062842.43,
+   "drawdown_pct": 0.0
+  },
+  {
+   "date": "2025-12-17",
+   "strategy": 1135169.74,
+   "nifty": 1103208.79,
+   "universe_ew": 1076121.27,
+   "drawdown_pct": 0.0
+  },
+  {
+   "date": "2025-12-18",
+   "strategy": 1151435.63,
+   "nifty": 1103596.21,
+   "universe_ew": 1075444.66,
+   "drawdown_pct": 0.0
+  },
+  {
+   "date": "2025-12-19",
+   "strategy": 1140393.53,
+   "nifty": 1090736.02,
+   "universe_ew": 1066354.33,
+   "drawdown_pct": -0.959
+  },
+  {
+   "date": "2025-12-22",
+   "strategy": 1146537.82,
+   "nifty": 1088407.14,
+   "universe_ew": 1066583.04,
+   "drawdown_pct": -0.4254
+  },
+  {
+   "date": "2025-12-23",
+   "strategy": 1162263.51,
+   "nifty": 1089222.34,
+   "universe_ew": 1073120.11,
+   "drawdown_pct": 0.0
+  },
+  {
+   "date": "2025-12-24",
+   "strategy": 1173761.12,
+   "nifty": 1080139.35,
+   "universe_ew": 1066210.78,
+   "drawdown_pct": 0.0
+  },
+  {
+   "date": "2025-12-25",
+   "strategy": 1181386.22,
+   "nifty": 1087738.93,
+   "universe_ew": 1073805.08,
+   "drawdown_pct": 0.0
+  },
+  {
+   "date": "2025-12-26",
+   "strategy": 1180685.96,
+   "nifty": 1089183.73,
+   "universe_ew": 1076477.91,
+   "drawdown_pct": -0.0593
+  },
+  {
+   "date": "2025-12-29",
+   "strategy": 1161550.49,
+   "nifty": 1090085.36,
+   "universe_ew": 1073911.83,
+   "drawdown_pct": -1.679
+  },
+  {
+   "date": "2025-12-30",
+   "strategy": 1171292.99,
+   "nifty": 1095882.12,
+   "universe_ew": 1084998.32,
+   "drawdown_pct": -0.8544
+  },
+  {
+   "date": "2025-12-31",
+   "strategy": 1172718.86,
+   "nifty": 1092963.99,
+   "universe_ew": 1081417.32,
+   "drawdown_pct": -0.7337
+  },
+  {
+   "date": "2026-01-01",
+   "strategy": 1174996.67,
+   "nifty": 1102485.74,
+   "universe_ew": 1095087.72,
+   "drawdown_pct": -0.5409
+  },
+  {
+   "date": "2026-01-02",
+   "strategy": 1176743.05,
+   "nifty": 1100077.44,
+   "universe_ew": 1093220.94,
+   "drawdown_pct": -0.393
+  },
+  {
+   "date": "2026-01-05",
+   "strategy": 1173172.54,
+   "nifty": 1108447.9,
+   "universe_ew": 1099892.69,
+   "drawdown_pct": -0.6953
+  },
+  {
+   "date": "2026-01-06",
+   "strategy": 1173045.12,
+   "nifty": 1107028.11,
+   "universe_ew": 1092300.97,
+   "drawdown_pct": -0.706
+  },
+  {
+   "date": "2026-01-07",
+   "strategy": 1175976.11,
+   "nifty": 1114188.5,
+   "universe_ew": 1099453.66,
+   "drawdown_pct": -0.4579
+  },
+  {
+   "date": "2026-01-08",
+   "strategy": 1178509.7,
+   "nifty": 1109122.26,
+   "universe_ew": 1093961.28,
+   "drawdown_pct": -0.2435
+  },
+  {
+   "date": "2026-01-09",
+   "strategy": 1162848.39,
+   "nifty": 1097738.9,
+   "universe_ew": 1083346.82,
+   "drawdown_pct": -1.5692
+  },
+  {
+   "date": "2026-01-12",
+   "strategy": 1171880.07,
+   "nifty": 1095739.52,
+   "universe_ew": 1082584.63,
+   "drawdown_pct": -0.8047
+  },
+  {
+   "date": "2026-01-13",
+   "strategy": 1181180.39,
+   "nifty": 1107777.93,
+   "universe_ew": 1094681.64,
+   "drawdown_pct": -0.0174
+  },
+  {
+   "date": "2026-01-14",
+   "strategy": 1179944.6,
+   "nifty": 1105808.82,
+   "universe_ew": 1091082.07,
+   "drawdown_pct": -0.122
+  },
+  {
+   "date": "2026-01-15",
+   "strategy": 1209450.91,
+   "nifty": 1122122.41,
+   "universe_ew": 1105246.89,
+   "drawdown_pct": 0.0
+  },
+  {
+   "date": "2026-01-16",
+   "strategy": 1218466.09,
+   "nifty": 1127154.86,
+   "universe_ew": 1110492.2,
+   "drawdown_pct": 0.0
+  },
+  {
+   "date": "2026-01-19",
+   "strategy": 1221622.65,
+   "nifty": 1123273.69,
+   "universe_ew": 1104102.61,
+   "drawdown_pct": 0.0
+  },
+  {
+   "date": "2026-01-20",
+   "strategy": 1222584.56,
+   "nifty": 1119684.28,
+   "universe_ew": 1101022.09,
+   "drawdown_pct": 0.0
+  },
+  {
+   "date": "2026-01-21",
+   "strategy": 1217635.52,
+   "nifty": 1110367.43,
+   "universe_ew": 1089531.88,
+   "drawdown_pct": -0.4048
+  },
+  {
+   "date": "2026-01-22",
+   "strategy": 1209556.14,
+   "nifty": 1106438.87,
+   "universe_ew": 1083651.53,
+   "drawdown_pct": -1.0656
+  },
+  {
+   "date": "2026-01-23",
+   "strategy": 1207079.28,
+   "nifty": 1100007.68,
+   "universe_ew": 1078921.31,
+   "drawdown_pct": -1.2682
+  },
+  {
+   "date": "2026-01-27",
+   "strategy": 1220871.33,
+   "nifty": 1109614.98,
+   "universe_ew": 1092390.58,
+   "drawdown_pct": -0.1401
+  },
+  {
+   "date": "2026-01-28",
+   "strategy": 1218468.37,
+   "nifty": 1109645.69,
+   "universe_ew": 1090645.56,
+   "drawdown_pct": -0.3367
+  },
+  {
+   "date": "2026-01-29",
+   "strategy": 1204247.24,
+   "nifty": 1098432.13,
+   "universe_ew": 1080654.34,
+   "drawdown_pct": -1.4999
+  },
+  {
+   "date": "2026-01-30",
+   "strategy": 1186880.57,
+   "nifty": 1093460.66,
+   "universe_ew": 1073863.37,
+   "drawdown_pct": -2.9204
+  },
+  {
+   "date": "2026-02-02",
+   "strategy": 1173026.29,
+   "nifty": 1083101.34,
+   "universe_ew": 1059599.28,
+   "drawdown_pct": -4.0536
+  },
+  {
+   "date": "2026-02-03",
+   "strategy": 1182109.01,
+   "nifty": 1096910.55,
+   "universe_ew": 1069800.4,
+   "drawdown_pct": -3.3107
+  },
+  {
+   "date": "2026-02-04",
+   "strategy": 1157655.14,
+   "nifty": 1085069.14,
+   "universe_ew": 1056058.14,
+   "drawdown_pct": -5.3108
+  },
+  {
+   "date": "2026-02-05",
+   "strategy": 1149268.95,
+   "nifty": 1091668.37,
+   "universe_ew": 1059931.12,
+   "drawdown_pct": -5.9968
+  },
+  {
+   "date": "2026-02-06",
+   "strategy": 1135232.66,
+   "nifty": 1075255.19,
+   "universe_ew": 1049390.49,
+   "drawdown_pct": -7.1449
+  },
+  {
+   "date": "2026-02-09",
+   "strategy": 1132101.96,
+   "nifty": 1070550.48,
+   "universe_ew": 1047157.86,
+   "drawdown_pct": -7.4009
+  },
+  {
+   "date": "2026-02-10",
+   "strategy": 1161012.17,
+   "nifty": 1073040.82,
+   "universe_ew": 1053507.2,
+   "drawdown_pct": -5.0362
+  },
+  {
+   "date": "2026-02-11",
+   "strategy": 1170987.55,
+   "nifty": 1091198.03,
+   "universe_ew": 1068750.19,
+   "drawdown_pct": -4.2203
+  },
+  {
+   "date": "2026-02-12",
+   "strategy": 1176561.98,
+   "nifty": 1105089.71,
+   "universe_ew": 1076077.75,
+   "drawdown_pct": -3.7644
+  },
+  {
+   "date": "2026-02-13",
+   "strategy": 1174953.98,
+   "nifty": 1109972.99,
+   "universe_ew": 1077788.6,
+   "drawdown_pct": -3.8959
+  },
+  {
+   "date": "2026-02-16",
+   "strategy": 1183464.44,
+   "nifty": 1114656.65,
+   "universe_ew": 1077529.84,
+   "drawdown_pct": -3.1998
+  },
+  {
+   "date": "2026-02-17",
+   "strategy": 1168527.6,
+   "nifty": 1109226.24,
+   "universe_ew": 1070825.7,
+   "drawdown_pct": -4.4215
+  },
+  {
+   "date": "2026-02-18",
+   "strategy": 1163478.3,
+   "nifty": 1106450.28,
+   "universe_ew": 1068197.68,
+   "drawdown_pct": -4.8345
+  },
+  {
+   "date": "2026-02-19",
+   "strategy": 1156469.07,
+   "nifty": 1115339.78,
+   "universe_ew": 1077027.42,
+   "drawdown_pct": -5.4078
+  },
+  {
+   "date": "2026-02-20",
+   "strategy": 1156413.26,
+   "nifty": 1115145.85,
+   "universe_ew": 1078600.56,
+   "drawdown_pct": -5.4124
+  },
+  {
+   "date": "2026-02-23",
+   "strategy": 1165927.05,
+   "nifty": 1130058.51,
+   "universe_ew": 1097969.14,
+   "drawdown_pct": -4.6342
+  },
+  {
+   "date": "2026-02-24",
+   "strategy": 1173905.53,
+   "nifty": 1135961.88,
+   "universe_ew": 1106962.68,
+   "drawdown_pct": -3.9816
+  },
+  {
+   "date": "2026-02-25",
+   "strategy": 1173076.38,
+   "nifty": 1139552.17,
+   "universe_ew": 1109029.6,
+   "drawdown_pct": -4.0495
+  },
+  {
+   "date": "2026-02-26",
+   "strategy": 1161839.43,
+   "nifty": 1119158.65,
+   "universe_ew": 1086304.43,
+   "drawdown_pct": -4.9686
+  },
+  {
+   "date": "2026-02-27",
+   "strategy": 1169939.26,
+   "nifty": 1128808.07,
+   "universe_ew": 1093698.14,
+   "drawdown_pct": -4.3061
+  },
+  {
+   "date": "2026-03-02",
+   "strategy": 1157296.53,
+   "nifty": 1120112.06,
+   "universe_ew": 1084577.1,
+   "drawdown_pct": -5.3402
+  },
+  {
+   "date": "2026-03-04",
+   "strategy": 1178183.98,
+   "nifty": 1120520.97,
+   "universe_ew": 1088352.93,
+   "drawdown_pct": -3.6317
+  },
+  {
+   "date": "2026-03-05",
+   "strategy": 1171198.55,
+   "nifty": 1126159.34,
+   "universe_ew": 1096548.66,
+   "drawdown_pct": -4.2031
+  },
+  {
+   "date": "2026-03-06",
+   "strategy": 1157957.82,
+   "nifty": 1112988.52,
+   "universe_ew": 1082593.11,
+   "drawdown_pct": -5.2861
+  },
+  {
+   "date": "2026-03-09",
+   "strategy": 1169859.28,
+   "nifty": 1112363.74,
+   "universe_ew": 1079914.06,
+   "drawdown_pct": -4.3126
+  },
+  {
+   "date": "2026-03-10",
+   "strategy": 1174950.44,
+   "nifty": 1113043.36,
+   "universe_ew": 1076343.13,
+   "drawdown_pct": -3.8962
+  },
+  {
+   "date": "2026-03-11",
+   "strategy": 1151573.62,
+   "nifty": 1097673.53,
+   "universe_ew": 1060079.69,
+   "drawdown_pct": -5.8083
+  },
+  {
+   "date": "2026-03-12",
+   "strategy": 1161454.75,
+   "nifty": 1092115.01,
+   "universe_ew": 1053713.22,
+   "drawdown_pct": -5.0
+  },
+  {
+   "date": "2026-03-13",
+   "strategy": 1151536.45,
+   "nifty": 1086104.15,
+   "universe_ew": 1048470.8,
+   "drawdown_pct": -5.8113
+  },
+  {
+   "date": "2026-03-16",
+   "strategy": 1168472.61,
+   "nifty": 1106297.15,
+   "universe_ew": 1069812.06,
+   "drawdown_pct": -4.426
+  },
+  {
+   "date": "2026-03-17",
+   "strategy": 1172148.66,
+   "nifty": 1106567.86,
+   "universe_ew": 1066730.61,
+   "drawdown_pct": -4.1254
+  },
+  {
+   "date": "2026-03-18",
+   "strategy": 1175678.83,
+   "nifty": 1123584.32,
+   "universe_ew": 1078094.92,
+   "drawdown_pct": -3.8366
+  },
+  {
+   "date": "2026-03-19",
+   "strategy": 1190834.91,
+   "nifty": 1137692.31,
+   "universe_ew": 1096923.8,
+   "drawdown_pct": -2.5969
+  },
+  {
+   "date": "2026-03-20",
+   "strategy": 1196019.83,
+   "nifty": 1140225.21,
+   "universe_ew": 1098034.44,
+   "drawdown_pct": -2.1728
+  },
+  {
+   "date": "2026-03-23",
+   "strategy": 1204490.52,
+   "nifty": 1137026.29,
+   "universe_ew": 1094584.68,
+   "drawdown_pct": -1.48
+  },
+  {
+   "date": "2026-03-24",
+   "strategy": 1227132.09,
+   "nifty": 1145643.77,
+   "universe_ew": 1106701.53,
+   "drawdown_pct": 0.0
+  },
+  {
+   "date": "2026-03-25",
+   "strategy": 1224275.89,
+   "nifty": 1140377.89,
+   "universe_ew": 1102289.06,
+   "drawdown_pct": -0.2328
+  },
+  {
+   "date": "2026-03-27",
+   "strategy": 1225192.44,
+   "nifty": 1130378.79,
+   "universe_ew": 1092292.9,
+   "drawdown_pct": -0.1581
+  },
+  {
+   "date": "2026-03-30",
+   "strategy": 1221435.38,
+   "nifty": 1124871.61,
+   "universe_ew": 1094524.91,
+   "drawdown_pct": -0.4642
+  }
+ ]
+}

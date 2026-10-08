@@ -1,0 +1,13 @@
+node_modules
+.next
+.turbo
+dist
+coverage
+.env*
+!.env.example
+*.tsbuildinfo
+.venv
+__pycache__
+.pytest_cache
+next-env.d.ts
+.tools

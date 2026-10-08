@@ -1,0 +1,51 @@
+{
+  "$schema": "https://turbo.build/schema.json",
+  "tasks": {
+    "build": {
+      "dependsOn": [
+        "^build"
+      ],
+      "outputs": [
+        ".next/**",
+        "!.next/cache/**"
+      ],
+      "env": [
+        "DD_API_URL",
+        "NEXT_PUBLIC_DD_API_URL"
+      ]
+    },
+    "dev": {
+      "cache": false,
+      "persistent": true,
+      "passThroughEnv": [
+        "DD_*",
+        "ANTHROPIC_*",
+        "NEXT_PUBLIC_*"
+      ]
+    },
+    "test": {
+      "outputs": [],
+      "env": [
+        "DD_TEST_DATABASE_URL",
+        "DD_TEST_REDIS_URL"
+      ]
+    },
+    "typecheck": {
+      "outputs": []
+    },
+    "@dd/web#build": {
+      "dependsOn": [
+        "^build",
+        "@dd/web#typecheck"
+      ],
+      "outputs": [
+        ".next/**",
+        "!.next/cache/**"
+      ],
+      "env": [
+        "DD_API_URL",
+        "NEXT_PUBLIC_DD_API_URL"
+      ]
+    }
+  }
+}

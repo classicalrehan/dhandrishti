@@ -1,0 +1,887 @@
+{
+ "as_of": "2026-10-05",
+ "config_version": "2026.10-v1",
+ "data_provenance": "MOCK",
+ "stocks": [
+  {
+   "rank": 1,
+   "symbol": "ADANIPORTS",
+   "total_score": 88.68,
+   "confidence": "HIGH",
+   "risk_level": "LOW",
+   "risk_points": 0,
+   "data_coverage": 1.0,
+   "key_reason": "Earnings Growth + Technical Trend + Sector Strength",
+   "components": {
+    "fundamentals": 20.69,
+    "earningsGrowth": 20.0,
+    "momentum": 12.16,
+    "technicalTrend": 13.58,
+    "valuation": 7.93,
+    "liquidity": 5.0,
+    "sectorStrength": 4.32,
+    "risk": 5.0
+   }
+  },
+  {
+   "rank": 2,
+   "symbol": "HINDUNILVR",
+   "total_score": 84.44,
+   "confidence": "HIGH",
+   "risk_level": "LOW",
+   "risk_points": 0,
+   "data_coverage": 1.0,
+   "key_reason": "Earnings Growth + Fundamental Quality + Technical Trend",
+   "components": {
+    "fundamentals": 23.39,
+    "earningsGrowth": 20.0,
+    "momentum": 10.68,
+    "technicalTrend": 12.48,
+    "valuation": 5.74,
+    "liquidity": 5.0,
+    "sectorStrength": 2.14,
+    "risk": 5.0
+   }
+  },
+  {
+   "rank": 3,
+   "symbol": "TITAN",
+   "total_score": 84.41,
+   "confidence": "HIGH",
+   "risk_level": "MEDIUM",
+   "risk_points": 2,
+   "data_coverage": 1.0,
+   "key_reason": "Earnings Growth + Technical Trend + Fundamental Quality",
+   "components": {
+    "fundamentals": 22.64,
+    "earningsGrowth": 19.92,
+    "momentum": 13.34,
+    "technicalTrend": 13.59,
+    "valuation": 3.64,
+    "liquidity": 5.0,
+    "sectorStrength": 2.28,
+    "risk": 4.0
+   }
+  },
+  {
+   "rank": 4,
+   "symbol": "DRREDDY",
+   "total_score": 83.4,
+   "confidence": "HIGH",
+   "risk_level": "LOW",
+   "risk_points": 0,
+   "data_coverage": 1.0,
+   "key_reason": "Earnings Growth + Technical Trend + Fundamental Quality",
+   "components": {
+    "fundamentals": 20.43,
+    "earningsGrowth": 20.0,
+    "momentum": 8.61,
+    "technicalTrend": 14.14,
+    "valuation": 6.52,
+    "liquidity": 5.0,
+    "sectorStrength": 3.69,
+    "risk": 5.0
+   }
+  },
+  {
+   "rank": 5,
+   "symbol": "MARUTI",
+   "total_score": 81.23,
+   "confidence": "HIGH",
+   "risk_level": "LOW",
+   "risk_points": 0,
+   "data_coverage": 1.0,
+   "key_reason": "Earnings Growth + Fundamental Quality + Technical Trend",
+   "components": {
+    "fundamentals": 23.2,
+    "earningsGrowth": 19.56,
+    "momentum": 6.62,
+    "technicalTrend": 13.72,
+    "valuation": 6.45,
+    "liquidity": 5.0,
+    "sectorStrength": 1.68,
+    "risk": 5.0
+   }
+  },
+  {
+   "rank": 6,
+   "symbol": "BRITANNIA",
+   "total_score": 80.71,
+   "confidence": "HIGH",
+   "risk_level": "LOW",
+   "risk_points": 0,
+   "data_coverage": 1.0,
+   "key_reason": "Technical Trend + Fundamental Quality + Momentum",
+   "components": {
+    "fundamentals": 23.71,
+    "earningsGrowth": 13.07,
+    "momentum": 12.46,
+    "technicalTrend": 14.38,
+    "valuation": 4.94,
+    "liquidity": 5.0,
+    "sectorStrength": 2.14,
+    "risk": 5.0
+   }
+  },
+  {
+   "rank": 7,
+   "symbol": "SUNPHARMA",
+   "total_score": 79.78,
+   "confidence": "HIGH",
+   "risk_level": "LOW",
+   "risk_points": 0,
+   "data_coverage": 1.0,
+   "key_reason": "Technical Trend + Fundamental Quality + Momentum",
+   "components": {
+    "fundamentals": 20.45,
+    "earningsGrowth": 14.89,
+    "momentum": 12.09,
+    "technicalTrend": 14.66,
+    "valuation": 4.0,
+    "liquidity": 5.0,
+    "sectorStrength": 3.69,
+    "risk": 5.0
+   }
+  },
+  {
+   "rank": 8,
+   "symbol": "TCS",
+   "total_score": 79.72,
+   "confidence": "HIGH",
+   "risk_level": "LOW",
+   "risk_points": 1,
+   "data_coverage": 1.0,
+   "key_reason": "Technical Trend + Fundamental Quality + Momentum",
+   "components": {
+    "fundamentals": 21.9,
+    "earningsGrowth": 12.64,
+    "momentum": 12.75,
+    "technicalTrend": 13.69,
+    "valuation": 7.76,
+    "liquidity": 5.0,
+    "sectorStrength": 1.48,
+    "risk": 4.5
+   }
+  },
+  {
+   "rank": 9,
+   "symbol": "HDFCBANK",
+   "total_score": 77.29,
+   "confidence": "HIGH",
+   "risk_level": "LOW",
+   "risk_points": 1,
+   "data_coverage": 1.0,
+   "key_reason": "Technical Trend + Earnings Growth + Momentum",
+   "components": {
+    "fundamentals": 14.94,
+    "earningsGrowth": 17.39,
+    "momentum": 12.47,
+    "technicalTrend": 13.49,
+    "valuation": 7.7,
+    "liquidity": 5.0,
+    "sectorStrength": 1.8,
+    "risk": 4.5
+   }
+  },
+  {
+   "rank": 10,
+   "symbol": "LT",
+   "total_score": 75.77,
+   "confidence": "HIGH",
+   "risk_level": "LOW",
+   "risk_points": 0,
+   "data_coverage": 1.0,
+   "key_reason": "Technical Trend + Sector Strength + Fundamental Quality",
+   "components": {
+    "fundamentals": 19.78,
+    "earningsGrowth": 13.35,
+    "momentum": 10.72,
+    "technicalTrend": 13.75,
+    "valuation": 3.84,
+    "liquidity": 5.0,
+    "sectorStrength": 4.32,
+    "risk": 5.0
+   }
+  },
+  {
+   "rank": 11,
+   "symbol": "RELIANCE",
+   "total_score": 74.15,
+   "confidence": "HIGH",
+   "risk_level": "LOW",
+   "risk_points": 0,
+   "data_coverage": 1.0,
+   "key_reason": "Technical Trend + Sector Strength + Fundamental Quality",
+   "components": {
+    "fundamentals": 19.51,
+    "earningsGrowth": 8.03,
+    "momentum": 11.64,
+    "technicalTrend": 13.68,
+    "valuation": 7.28,
+    "liquidity": 5.0,
+    "sectorStrength": 3.99,
+    "risk": 5.0
+   }
+  },
+  {
+   "rank": 12,
+   "symbol": "DIVISLAB",
+   "total_score": 73.8,
+   "confidence": "HIGH",
+   "risk_level": "MEDIUM",
+   "risk_points": 2,
+   "data_coverage": 1.0,
+   "key_reason": "Technical Trend + Momentum + Sector Strength",
+   "components": {
+    "fundamentals": 16.6,
+    "earningsGrowth": 11.7,
+    "momentum": 13.75,
+    "technicalTrend": 14.83,
+    "valuation": 4.23,
+    "liquidity": 5.0,
+    "sectorStrength": 3.69,
+    "risk": 4.0
+   }
+  },
+  {
+   "rank": 13,
+   "symbol": "BPCL",
+   "total_score": 72.92,
+   "confidence": "HIGH",
+   "risk_level": "LOW",
+   "risk_points": 0,
+   "data_coverage": 1.0,
+   "key_reason": "Technical Trend + Sector Strength + Momentum",
+   "components": {
+    "fundamentals": 16.95,
+    "earningsGrowth": 11.57,
+    "momentum": 10.23,
+    "technicalTrend": 13.49,
+    "valuation": 6.69,
+    "liquidity": 5.0,
+    "sectorStrength": 3.99,
+    "risk": 5.0
+   }
+  },
+  {
+   "rank": 14,
+   "symbol": "CIPLA",
+   "total_score": 71.31,
+   "confidence": "HIGH",
+   "risk_level": "LOW",
+   "risk_points": 0,
+   "data_coverage": 1.0,
+   "key_reason": "Technical Trend + Earnings Growth + Sector Strength",
+   "components": {
+    "fundamentals": 17.84,
+    "earningsGrowth": 15.29,
+    "momentum": 8.29,
+    "technicalTrend": 11.98,
+    "valuation": 4.21,
+    "liquidity": 5.0,
+    "sectorStrength": 3.69,
+    "risk": 5.0
+   }
+  },
+  {
+   "rank": 15,
+   "symbol": "GRASIM",
+   "total_score": 68.66,
+   "confidence": "HIGH",
+   "risk_level": "LOW",
+   "risk_points": 1,
+   "data_coverage": 1.0,
+   "key_reason": "Technical Trend + Momentum + Sector Strength",
+   "components": {
+    "fundamentals": 16.19,
+    "earningsGrowth": 6.13,
+    "momentum": 13.63,
+    "technicalTrend": 13.69,
+    "valuation": 5.27,
+    "liquidity": 5.0,
+    "sectorStrength": 4.24,
+    "risk": 4.5
+   }
+  },
+  {
+   "rank": 16,
+   "symbol": "BHARTIARTL",
+   "total_score": 68.06,
+   "confidence": "HIGH",
+   "risk_level": "MEDIUM",
+   "risk_points": 3,
+   "data_coverage": 1.0,
+   "key_reason": "Earnings Growth + Technical Trend + Fundamental Quality",
+   "components": {
+    "fundamentals": 15.79,
+    "earningsGrowth": 20.0,
+    "momentum": 6.47,
+    "technicalTrend": 12.76,
+    "valuation": 3.98,
+    "liquidity": 3.45,
+    "sectorStrength": 2.13,
+    "risk": 3.5
+   }
+  },
+  {
+   "rank": 17,
+   "symbol": "SBILIFE",
+   "total_score": 67.68,
+   "confidence": "HIGH",
+   "risk_level": "MEDIUM",
+   "risk_points": 2,
+   "data_coverage": 1.0,
+   "key_reason": "Technical Trend + Earnings Growth + Valuation",
+   "components": {
+    "fundamentals": 13.09,
+    "earningsGrowth": 14.83,
+    "momentum": 7.14,
+    "technicalTrend": 13.31,
+    "valuation": 7.14,
+    "liquidity": 5.0,
+    "sectorStrength": 3.16,
+    "risk": 4.0
+   }
+  },
+  {
+   "rank": 18,
+   "symbol": "BAJFINANCE",
+   "total_score": 67.45,
+   "confidence": "HIGH",
+   "risk_level": "LOW",
+   "risk_points": 0,
+   "data_coverage": 1.0,
+   "key_reason": "Technical Trend + Earnings Growth + Fundamental Quality",
+   "components": {
+    "fundamentals": 16.16,
+    "earningsGrowth": 13.55,
+    "momentum": 8.48,
+    "technicalTrend": 14.68,
+    "valuation": 1.78,
+    "liquidity": 4.64,
+    "sectorStrength": 3.16,
+    "risk": 5.0
+   }
+  },
+  {
+   "rank": 19,
+   "symbol": "INDUSINDBK",
+   "total_score": 67.36,
+   "confidence": "HIGH",
+   "risk_level": "LOW",
+   "risk_points": 0,
+   "data_coverage": 1.0,
+   "key_reason": "Earnings Growth + Fundamental Quality",
+   "components": {
+    "fundamentals": 20.57,
+    "earningsGrowth": 18.84,
+    "momentum": 3.12,
+    "technicalTrend": 8.33,
+    "valuation": 4.7,
+    "liquidity": 5.0,
+    "sectorStrength": 1.8,
+    "risk": 5.0
+   }
+  },
+  {
+   "rank": 20,
+   "symbol": "HDFCLIFE",
+   "total_score": 67.21,
+   "confidence": "HIGH",
+   "risk_level": "LOW",
+   "risk_points": 0,
+   "data_coverage": 1.0,
+   "key_reason": "Earnings Growth + Technical Trend + Sector Strength",
+   "components": {
+    "fundamentals": 11.65,
+    "earningsGrowth": 16.65,
+    "momentum": 7.14,
+    "technicalTrend": 12.4,
+    "valuation": 6.21,
+    "liquidity": 5.0,
+    "sectorStrength": 3.16,
+    "risk": 5.0
+   }
+  },
+  {
+   "rank": 21,
+   "symbol": "ASIANPAINT",
+   "total_score": 66.69,
+   "confidence": "MEDIUM",
+   "risk_level": "LOW",
+   "risk_points": 1,
+   "data_coverage": 1.0,
+   "key_reason": "Earnings Growth + Fundamental Quality",
+   "components": {
+    "fundamentals": 23.83,
+    "earningsGrowth": 20.0,
+    "momentum": 2.16,
+    "technicalTrend": 4.81,
+    "valuation": 4.1,
+    "liquidity": 5.0,
+    "sectorStrength": 2.28,
+    "risk": 4.5
+   }
+  },
+  {
+   "rank": 22,
+   "symbol": "INFY",
+   "total_score": 66.38,
+   "confidence": "HIGH",
+   "risk_level": "LOW",
+   "risk_points": 0,
+   "data_coverage": 1.0,
+   "key_reason": "Fundamental Quality + Technical Trend + Momentum",
+   "components": {
+    "fundamentals": 21.05,
+    "earningsGrowth": 7.15,
+    "momentum": 10.16,
+    "technicalTrend": 12.2,
+    "valuation": 4.35,
+    "liquidity": 5.0,
+    "sectorStrength": 1.48,
+    "risk": 5.0
+   }
+  },
+  {
+   "rank": 23,
+   "symbol": "SBIN",
+   "total_score": 66.2,
+   "confidence": "MEDIUM",
+   "risk_level": "LOW",
+   "risk_points": 1,
+   "data_coverage": 1.0,
+   "key_reason": "Earnings Growth + Fundamental Quality",
+   "components": {
+    "fundamentals": 20.99,
+    "earningsGrowth": 20.0,
+    "momentum": 1.76,
+    "technicalTrend": 7.73,
+    "valuation": 4.42,
+    "liquidity": 5.0,
+    "sectorStrength": 1.8,
+    "risk": 4.5
+   }
+  },
+  {
+   "rank": 24,
+   "symbol": "WIPRO",
+   "total_score": 64.54,
+   "confidence": "HIGH",
+   "risk_level": "MEDIUM",
+   "risk_points": 2,
+   "data_coverage": 1.0,
+   "key_reason": "Technical Trend + Momentum + Fundamental Quality",
+   "components": {
+    "fundamentals": 18.24,
+    "earningsGrowth": 5.89,
+    "momentum": 12.35,
+    "technicalTrend": 13.48,
+    "valuation": 4.1,
+    "liquidity": 5.0,
+    "sectorStrength": 1.48,
+    "risk": 4.0
+   }
+  },
+  {
+   "rank": 25,
+   "symbol": "NESTLEIND",
+   "total_score": 63.68,
+   "confidence": "HIGH",
+   "risk_level": "LOW",
+   "risk_points": 0,
+   "data_coverage": 1.0,
+   "key_reason": "Fundamental Quality + Technical Trend",
+   "components": {
+    "fundamentals": 22.27,
+    "earningsGrowth": 11.22,
+    "momentum": 3.91,
+    "technicalTrend": 10.23,
+    "valuation": 3.9,
+    "liquidity": 5.0,
+    "sectorStrength": 2.14,
+    "risk": 5.0
+   }
+  },
+  {
+   "rank": 26,
+   "symbol": "POWERGRID",
+   "total_score": 63.65,
+   "confidence": "HIGH",
+   "risk_level": "MEDIUM",
+   "risk_points": 2,
+   "data_coverage": 1.0,
+   "key_reason": "Technical Trend + Momentum + Fundamental Quality",
+   "components": {
+    "fundamentals": 16.87,
+    "earningsGrowth": 2.91,
+    "momentum": 13.27,
+    "technicalTrend": 15.0,
+    "valuation": 4.62,
+    "liquidity": 5.0,
+    "sectorStrength": 1.97,
+    "risk": 4.0
+   }
+  },
+  {
+   "rank": 27,
+   "symbol": "ITC",
+   "total_score": 62.84,
+   "confidence": "HIGH",
+   "risk_level": "LOW",
+   "risk_points": 0,
+   "data_coverage": 1.0,
+   "key_reason": "Fundamental Quality + Technical Trend",
+   "components": {
+    "fundamentals": 22.17,
+    "earningsGrowth": 8.84,
+    "momentum": 4.65,
+    "technicalTrend": 10.34,
+    "valuation": 4.71,
+    "liquidity": 5.0,
+    "sectorStrength": 2.14,
+    "risk": 5.0
+   }
+  },
+  {
+   "rank": 28,
+   "symbol": "KOTAKBANK",
+   "total_score": 62.78,
+   "confidence": "HIGH",
+   "risk_level": "LOW",
+   "risk_points": 0,
+   "data_coverage": 1.0,
+   "key_reason": "Technical Trend + Valuation + Momentum",
+   "components": {
+    "fundamentals": 12.87,
+    "earningsGrowth": 8.36,
+    "momentum": 10.52,
+    "technicalTrend": 11.99,
+    "valuation": 7.25,
+    "liquidity": 5.0,
+    "sectorStrength": 1.8,
+    "risk": 5.0
+   }
+  },
+  {
+   "rank": 29,
+   "symbol": "ULTRACEMCO",
+   "total_score": 62.72,
+   "confidence": "HIGH",
+   "risk_level": "LOW",
+   "risk_points": 0,
+   "data_coverage": 1.0,
+   "key_reason": "Sector Strength + Technical Trend + Fundamental Quality",
+   "components": {
+    "fundamentals": 15.3,
+    "earningsGrowth": 8.53,
+    "momentum": 8.78,
+    "technicalTrend": 12.0,
+    "valuation": 3.87,
+    "liquidity": 5.0,
+    "sectorStrength": 4.24,
+    "risk": 5.0
+   }
+  },
+  {
+   "rank": 30,
+   "symbol": "BAJAJFINSV",
+   "total_score": 58.9,
+   "confidence": "HIGH",
+   "risk_level": "LOW",
+   "risk_points": 1,
+   "data_coverage": 1.0,
+   "key_reason": "Technical Trend + Momentum + Sector Strength",
+   "components": {
+    "fundamentals": 10.41,
+    "earningsGrowth": 3.75,
+    "momentum": 12.43,
+    "technicalTrend": 13.71,
+    "valuation": 5.93,
+    "liquidity": 5.0,
+    "sectorStrength": 3.16,
+    "risk": 4.5
+   }
+  },
+  {
+   "rank": 31,
+   "symbol": "ONGC",
+   "total_score": 58.5,
+   "confidence": "MEDIUM",
+   "risk_level": "MEDIUM",
+   "risk_points": 3,
+   "data_coverage": 1.0,
+   "key_reason": "Technical Trend + Momentum + Sector Strength",
+   "components": {
+    "fundamentals": 15.96,
+    "earningsGrowth": 1.88,
+    "momentum": 12.13,
+    "technicalTrend": 14.44,
+    "valuation": 1.59,
+    "liquidity": 5.0,
+    "sectorStrength": 3.99,
+    "risk": 3.5
+   }
+  },
+  {
+   "rank": 32,
+   "symbol": "TECHM",
+   "total_score": 58.02,
+   "confidence": "HIGH",
+   "risk_level": "LOW",
+   "risk_points": 0,
+   "data_coverage": 0.949,
+   "key_reason": "Fundamental Quality",
+   "components": {
+    "fundamentals": 21.55,
+    "earningsGrowth": 6.62,
+    "momentum": 7.33,
+    "technicalTrend": 8.83,
+    "valuation": 2.21,
+    "liquidity": 5.0,
+    "sectorStrength": 1.48,
+    "risk": 5.0
+   }
+  },
+  {
+   "rank": 33,
+   "symbol": "ICICIBANK",
+   "total_score": 58.0,
+   "confidence": "HIGH",
+   "risk_level": "LOW",
+   "risk_points": 0,
+   "data_coverage": 1.0,
+   "key_reason": "Technical Trend",
+   "components": {
+    "fundamentals": 13.32,
+    "earningsGrowth": 11.92,
+    "momentum": 5.93,
+    "technicalTrend": 9.23,
+    "valuation": 5.8,
+    "liquidity": 5.0,
+    "sectorStrength": 1.8,
+    "risk": 5.0
+   }
+  },
+  {
+   "rank": 34,
+   "symbol": "JSWSTEEL",
+   "total_score": 56.42,
+   "confidence": "HIGH",
+   "risk_level": "LOW",
+   "risk_points": 1,
+   "data_coverage": 1.0,
+   "key_reason": "Fundamental Quality + Technical Trend",
+   "components": {
+    "fundamentals": 18.67,
+    "earningsGrowth": 6.92,
+    "momentum": 6.63,
+    "technicalTrend": 9.17,
+    "valuation": 4.09,
+    "liquidity": 5.0,
+    "sectorStrength": 1.44,
+    "risk": 4.5
+   }
+  },
+  {
+   "rank": 35,
+   "symbol": "EICHERMOT",
+   "total_score": 54.99,
+   "confidence": "HIGH",
+   "risk_level": "LOW",
+   "risk_points": 0,
+   "data_coverage": 1.0,
+   "key_reason": "Technical Trend + Fundamental Quality",
+   "components": {
+    "fundamentals": 17.34,
+    "earningsGrowth": 4.27,
+    "momentum": 5.04,
+    "technicalTrend": 12.37,
+    "valuation": 4.29,
+    "liquidity": 5.0,
+    "sectorStrength": 1.68,
+    "risk": 5.0
+   }
+  },
+  {
+   "rank": 36,
+   "symbol": "NTPC",
+   "total_score": 54.61,
+   "confidence": "HIGH",
+   "risk_level": "LOW",
+   "risk_points": 1,
+   "data_coverage": 1.0,
+   "key_reason": "Fundamental Quality",
+   "components": {
+    "fundamentals": 15.45,
+    "earningsGrowth": 9.36,
+    "momentum": 5.41,
+    "technicalTrend": 8.01,
+    "valuation": 4.91,
+    "liquidity": 5.0,
+    "sectorStrength": 1.97,
+    "risk": 4.5
+   }
+  },
+  {
+   "rank": 37,
+   "symbol": "HCLTECH",
+   "total_score": 54.16,
+   "confidence": "MEDIUM",
+   "risk_level": "LOW",
+   "risk_points": 0,
+   "data_coverage": 1.0,
+   "key_reason": "Fundamental Quality",
+   "components": {
+    "fundamentals": 22.33,
+    "earningsGrowth": 3.12,
+    "momentum": 3.45,
+    "technicalTrend": 7.92,
+    "valuation": 5.87,
+    "liquidity": 5.0,
+    "sectorStrength": 1.48,
+    "risk": 5.0
+   }
+  },
+  {
+   "rank": 38,
+   "symbol": "AXISBANK",
+   "total_score": 51.74,
+   "confidence": "HIGH",
+   "risk_level": "LOW",
+   "risk_points": 0,
+   "data_coverage": 1.0,
+   "key_reason": "Technical Trend",
+   "components": {
+    "fundamentals": 11.89,
+    "earningsGrowth": 1.8,
+    "momentum": 8.98,
+    "technicalTrend": 11.84,
+    "valuation": 5.43,
+    "liquidity": 5.0,
+    "sectorStrength": 1.8,
+    "risk": 5.0
+   }
+  },
+  {
+   "rank": 39,
+   "symbol": "TATASTEEL",
+   "total_score": 51.03,
+   "confidence": "MEDIUM",
+   "risk_level": "MEDIUM",
+   "risk_points": 2,
+   "data_coverage": 1.0,
+   "key_reason": "Technical Trend + Momentum",
+   "components": {
+    "fundamentals": 7.84,
+    "earningsGrowth": 0.69,
+    "momentum": 12.46,
+    "technicalTrend": 14.69,
+    "valuation": 4.91,
+    "liquidity": 5.0,
+    "sectorStrength": 1.44,
+    "risk": 4.0
+   }
+  },
+  {
+   "rank": 40,
+   "symbol": "DLF",
+   "total_score": 50.82,
+   "confidence": "HIGH",
+   "risk_level": "MEDIUM",
+   "risk_points": 2,
+   "data_coverage": 1.0,
+   "key_reason": "Technical Trend",
+   "components": {
+    "fundamentals": 14.09,
+    "earningsGrowth": 7.47,
+    "momentum": 6.31,
+    "technicalTrend": 9.18,
+    "valuation": 3.48,
+    "liquidity": 4.39,
+    "sectorStrength": 1.9,
+    "risk": 4.0
+   }
+  },
+  {
+   "rank": 41,
+   "symbol": "M&M",
+   "total_score": 50.68,
+   "confidence": "MEDIUM",
+   "risk_level": "LOW",
+   "risk_points": 0,
+   "data_coverage": 1.0,
+   "key_reason": "Technical Trend + Momentum",
+   "components": {
+    "fundamentals": 11.74,
+    "earningsGrowth": 0.0,
+    "momentum": 9.07,
+    "technicalTrend": 13.23,
+    "valuation": 4.96,
+    "liquidity": 5.0,
+    "sectorStrength": 1.68,
+    "risk": 5.0
+   }
+  },
+  {
+   "rank": 42,
+   "symbol": "GODREJPROP",
+   "total_score": 50.61,
+   "confidence": "HIGH",
+   "risk_level": "MEDIUM",
+   "risk_points": 2,
+   "data_coverage": 0.933,
+   "key_reason": "Earnings Growth",
+   "components": {
+    "fundamentals": 14.42,
+    "earningsGrowth": 12.23,
+    "momentum": 4.51,
+    "technicalTrend": 3.59,
+    "valuation": 4.97,
+    "liquidity": 5.0,
+    "sectorStrength": 1.9,
+    "risk": 4.0
+   }
+  },
+  {
+   "rank": 43,
+   "symbol": "BAJAJ-AUTO",
+   "total_score": 47.32,
+   "confidence": "MEDIUM",
+   "risk_level": "LOW",
+   "risk_points": 0,
+   "data_coverage": 1.0,
+   "key_reason": "Technical Trend",
+   "components": {
+    "fundamentals": 13.58,
+    "earningsGrowth": 0.01,
+    "momentum": 5.79,
+    "technicalTrend": 12.76,
+    "valuation": 3.49,
+    "liquidity": 5.0,
+    "sectorStrength": 1.68,
+    "risk": 5.0
+   }
+  },
+  {
+   "rank": 44,
+   "symbol": "HINDALCO",
+   "total_score": 46.04,
+   "confidence": "MEDIUM",
+   "risk_level": "LOW",
+   "risk_points": 1,
+   "data_coverage": 1.0,
+   "key_reason": "Technical Trend",
+   "components": {
+    "fundamentals": 12.52,
+    "earningsGrowth": 0.0,
+    "momentum": 6.13,
+    "technicalTrend": 11.27,
+    "valuation": 5.18,
+    "liquidity": 5.0,
+    "sectorStrength": 1.44,
+    "risk": 4.5
+   }
+  }
+ ]
+}

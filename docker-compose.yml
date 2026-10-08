@@ -1,0 +1,35 @@
+# Local development infrastructure. App services (api, web, worker) are added in later increments.
+#   docker compose up -d
+name: dhandrishti
+
+services:
+  postgres:
+    image: timescale/timescaledb:2.30.2-pg17
+    environment:
+      POSTGRES_USER: ${DD_PG_USER:-dhandrishti}
+      POSTGRES_PASSWORD: ${DD_PG_PASSWORD:-dhandrishti_dev}
+      POSTGRES_DB: ${DD_PG_DB:-dhandrishti}
+      TIMESCALEDB_TELEMETRY: "off"
+    ports:
+      - "${DD_PG_PORT:-5432}:5432"
+    volumes:
+      - pgdata:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U $${POSTGRES_USER} -d $${POSTGRES_DB}"]
+      interval: 5s
+      timeout: 3s
+      retries: 20
+
+  redis:
+    image: redis:8.8-alpine
+    command: ["redis-server", "--save", "", "--appendonly", "no"]  # cache only, never a source of truth
+    ports:
+      - "${DD_REDIS_PORT:-6379}:6379"
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 5s
+      timeout: 3s
+      retries: 20
+
+volumes:
+  pgdata:

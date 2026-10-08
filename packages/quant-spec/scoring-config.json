@@ -1,0 +1,163 @@
+{
+  "$comment": "Single source of truth for DhanDrishti scoring weights and thresholds. Semantics: SPEC.md. Do not duplicate these numbers in code.",
+  "version": "2026.10-v1",
+  "missing_data_neutral": 0.5,
+  "min_avg_traded_value_cr": 5,
+  "reason_thresholds": { "positive": 0.7, "negative": 0.3 },
+  "key_reason": {
+    "min_normalized": 0.6,
+    "max_items": 3,
+    "components": ["fundamentals", "earningsGrowth", "momentum", "technicalTrend", "valuation", "sectorStrength"]
+  },
+
+  "components": {
+    "fundamentals": {
+      "label": "Fundamental Quality",
+      "weight": 25,
+      "metrics": {
+        "roe":                   { "weight": 3, "fn": "ramp", "lo": 8, "hi": 22, "label": "ROE", "unit": "%" },
+        "roce":                  { "weight": 2, "fn": "ramp", "lo": 8, "hi": 25, "label": "ROCE", "unit": "%", "non_financial_only": true },
+        "operating_margin_vs_sector": { "weight": 1, "fn": "ramp", "lo": -10, "hi": 10, "label": "Operating margin vs sector median", "unit": "pp", "non_financial_only": true },
+        "net_margin":            { "weight": 1, "fn": "ramp", "lo": 2, "hi": 20, "label": "Net margin", "unit": "%" },
+        "debt_to_equity":        { "weight": 2, "fn": "ramp", "lo": 2.0, "hi": 0.2, "label": "Debt / Equity", "unit": "x", "non_financial_only": true },
+        "interest_coverage":     { "weight": 1, "fn": "ramp", "lo": 1.5, "hi": 10, "label": "Interest coverage", "unit": "x", "non_financial_only": true },
+        "cfo_to_pat":            { "weight": 2, "fn": "ramp", "lo": 0.5, "hi": 1.1, "label": "Cash-flow quality (CFO / PAT)", "unit": "x" },
+        "fcf_positive":          { "weight": 1, "fn": "binary", "label": "Positive free cash flow", "non_financial_only": true },
+        "promoter_pledge":       { "weight": 1, "fn": "ramp", "lo": 20, "hi": 0, "label": "Promoter pledge", "unit": "%" },
+        "earnings_consistency":  { "weight": 2, "fn": "ramp", "lo": 0, "hi": 1, "label": "Earnings consistency (last 8 quarters with YoY EPS growth)", "unit": "share" }
+      }
+    },
+    "earningsGrowth": {
+      "label": "Earnings Growth",
+      "weight": 20,
+      "metrics": {
+        "revenue_growth_yoy": { "weight": 2, "fn": "ramp", "lo": 0, "hi": 20, "label": "Revenue growth (YoY)", "unit": "%" },
+        "profit_growth_yoy":  { "weight": 2, "fn": "ramp", "lo": 0, "hi": 25, "label": "Profit growth (YoY)", "unit": "%" },
+        "eps_growth_yoy":     { "weight": 2, "fn": "ramp", "lo": 0, "hi": 25, "label": "EPS growth (YoY)", "unit": "%" },
+        "eps_cagr_3y":        { "weight": 3, "fn": "ramp", "lo": 0, "hi": 20, "label": "EPS CAGR (3Y)", "unit": "%" },
+        "ttm_eps_growth":     { "weight": 1, "fn": "ramp", "lo": 0, "hi": 25, "label": "TTM EPS growth (last 4Q vs prior 4Q)", "unit": "%" }
+      }
+    },
+    "momentum": {
+      "label": "Momentum",
+      "weight": 15,
+      "metrics": {
+        "ret_1m":              { "weight": 1, "fn": "ramp", "lo": -5, "hi": 8, "label": "1M return", "unit": "%" },
+        "ret_3m":              { "weight": 2, "fn": "ramp", "lo": -10, "hi": 20, "label": "3M return", "unit": "%" },
+        "ret_6m":              { "weight": 2, "fn": "ramp", "lo": -15, "hi": 30, "label": "6M return", "unit": "%" },
+        "ret_1y":              { "weight": 1, "fn": "ramp", "lo": -20, "hi": 40, "label": "1Y return", "unit": "%" },
+        "rs_nifty_3m":         { "weight": 2, "fn": "ramp", "lo": -10, "hi": 10, "label": "Relative strength vs NIFTY 50 (3M)", "unit": "pp" },
+        "rs_nifty_6m":         { "weight": 2, "fn": "ramp", "lo": -15, "hi": 15, "label": "Relative strength vs NIFTY 50 (6M)", "unit": "pp" },
+        "up_down_volume_ratio": { "weight": 1, "fn": "ramp", "lo": 0.8, "hi": 1.5, "label": "Volume confirmation (up-day / down-day volume, 50D)", "unit": "x" },
+        "momentum_acceleration": { "weight": 1, "fn": "ramp", "lo": -5, "hi": 5, "label": "Momentum acceleration (1M − 3M/3)", "unit": "pp" }
+      }
+    },
+    "technicalTrend": {
+      "label": "Technical Trend",
+      "weight": 15,
+      "metrics": {
+        "above_sma50":         { "weight": 2, "fn": "binary", "label": "Price above 50 DMA" },
+        "above_sma200":        { "weight": 2, "fn": "binary", "label": "Price above 200 DMA" },
+        "sma50_above_sma200":  { "weight": 2, "fn": "binary", "label": "50 DMA above 200 DMA" },
+        "sma200_slope_20d":    { "weight": 2, "fn": "ramp", "lo": -2, "hi": 3, "label": "200 DMA slope (20 sessions)", "unit": "%" },
+        "directional_adx":     { "weight": 1, "fn": "ramp", "lo": 15, "hi": 35, "label": "Trend strength (ADX, when +DI > −DI)", "unit": "" },
+        "rsi14":               { "weight": 1, "fn": "band", "zero_lo": 30, "full_lo": 50, "full_hi": 68, "zero_hi": 82, "label": "RSI(14) in healthy range", "unit": "" },
+        "macd_hist_positive":  { "weight": 1, "fn": "binary", "label": "MACD above signal" },
+        "dist_from_52w_high":  { "weight": 1, "fn": "ramp", "lo": -30, "hi": -3, "label": "Distance from 52-week high", "unit": "%" }
+      }
+    },
+    "valuation": {
+      "label": "Valuation",
+      "weight": 10,
+      "metrics": {
+        "pe_vs_sector":   { "weight": 3, "fn": "ramp", "lo": 1.6, "hi": 0.7, "label": "PE relative to sector median", "unit": "x" },
+        "pe_vs_history":  { "weight": 2, "fn": "ramp", "lo": 1.4, "hi": 0.8, "label": "PE relative to own 5Y median", "unit": "x" },
+        "peg":            { "weight": 3, "fn": "ramp", "lo": 2.5, "hi": 1.0, "label": "PEG ratio", "unit": "x" },
+        "pb_vs_sector":   { "weight": 1, "weight_financial": 2, "fn": "ramp", "lo": 1.6, "hi": 0.7, "label": "PB relative to sector median", "unit": "x" },
+        "dividend_yield": { "weight": 1, "fn": "ramp", "lo": 0, "hi": 3, "label": "Dividend yield", "unit": "%" }
+      },
+      "value_trap_guard": { "min_quality": 0.4, "min_eps_cagr_3y": 0, "cap": 0.6 }
+    },
+    "liquidity": {
+      "label": "Liquidity",
+      "weight": 5,
+      "metrics": {
+        "avg_traded_value_cr": { "weight": 1, "fn": "log_ramp", "lo": 5, "hi": 200, "label": "Avg traded value (20D)", "unit": "₹ Cr" }
+      }
+    },
+    "sectorStrength": {
+      "label": "Sector Strength",
+      "weight": 5,
+      "metrics": {
+        "sector_strength": { "weight": 1, "fn": "ramp", "lo": 0, "hi": 1, "label": "Sector strength", "unit": "score100" }
+      }
+    },
+    "risk": {
+      "label": "Risk",
+      "weight": 5,
+      "metrics": {
+        "risk_points": { "weight": 1, "fn": "ramp", "lo": 10, "hi": 0, "label": "Risk penalty points", "unit": "pts" }
+      }
+    }
+  },
+
+  "sector": {
+    "metrics": {
+      "median_rs_nifty_3m":   { "weight": 2, "fn": "ramp", "lo": -8, "hi": 8 },
+      "pct_above_sma50":      { "weight": 1, "fn": "ramp", "lo": 0.3, "hi": 0.8 },
+      "median_rs_nifty_1m":   { "weight": 1, "fn": "ramp", "lo": -4, "hi": 4 },
+      "median_profit_growth": { "weight": 1, "fn": "ramp", "lo": 0, "hi": 20 }
+    }
+  },
+
+  "risk_flags": {
+    "volatility_60d":        { "elevated": 35, "extreme": 45 },
+    "max_drawdown_1y":       { "elevated": -25, "extreme": -35 },
+    "pe_vs_sector":          { "extreme": 2.0 },
+    "debt_to_equity":        { "elevated": 1.2, "extreme": 2.0 },
+    "interest_coverage":     { "elevated": 2.0 },
+    "promoter_pledge":       { "elevated": 10, "extreme": 25 },
+    "relative_volume":       { "elevated": 3.0 },
+    "gap_moves_60d":         { "elevated": 3 },
+    "dist_from_sma200":      { "elevated": 35 },
+    "event_window_days":     10,
+    "points":                { "elevated": 1, "extreme": 2 }
+  },
+  "risk_levels": [
+    { "level": "LOW",       "max_points": 1 },
+    { "level": "MEDIUM",    "max_points": 3 },
+    { "level": "HIGH",      "max_points": 5 },
+    { "level": "VERY_HIGH", "max_points": null }
+  ],
+
+  "confidence": {
+    "min_history_bars": 252,
+    "high_coverage": 0.9,
+    "medium_coverage": 0.7,
+    "dispersion_downgrade": 0.3
+  },
+
+  "regime": {
+    "thresholds": { "bullish": 65, "neutral": 50, "cautious": 35 },
+    "confidence_bounds": [30, 95],
+    "factors": {
+      "index_trend":          { "weight": 25, "label": "Index Trend" },
+      "bank_nifty_trend":     { "weight": 10, "label": "Bank NIFTY Trend" },
+      "breadth":              { "weight": 25, "label": "Market Breadth" },
+      "volatility":           { "weight": 15, "label": "Volatility (India VIX)" },
+      "sector_participation": { "weight": 15, "label": "Sector Participation" },
+      "index_momentum":       { "weight": 10, "label": "Index Momentum" }
+    },
+    "params": {
+      "trend_ret_3m":       { "fn": "ramp", "lo": -8, "hi": 8 },
+      "advance_ratio":      { "fn": "ramp", "lo": 0.3, "hi": 0.7 },
+      "pct_above_sma50":    { "fn": "ramp", "lo": 0.3, "hi": 0.75 },
+      "pct_above_sma200":   { "fn": "ramp", "lo": 0.3, "hi": 0.75 },
+      "vix_level":          { "fn": "ramp", "lo": 25, "hi": 12 },
+      "vix_change_1m":      { "fn": "ramp", "lo": 25, "hi": -15 },
+      "sectors_positive_1m": { "fn": "ramp", "lo": 0.3, "hi": 0.8 },
+      "nifty_ret_1m":       { "fn": "ramp", "lo": -4, "hi": 4 },
+      "nifty_ret_6m":       { "fn": "ramp", "lo": -10, "hi": 15 }
+    }
+  }
+}

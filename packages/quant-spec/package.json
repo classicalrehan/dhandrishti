@@ -1,0 +1,8 @@
+{
+  "name": "@dd/quant-spec",
+  "version": "0.1.0",
+  "private": true,
+  "description": "Language-neutral quantitative specification, scoring config and golden fixtures.",
+  "files": ["SPEC.md", "scoring-config.json", "fixtures"],
+  "exports": { "./scoring-config.json": "./scoring-config.json" }
+}

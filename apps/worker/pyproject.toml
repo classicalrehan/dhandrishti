@@ -1,0 +1,25 @@
+[project]
+name = "dhandrishti-worker"
+version = "0.1.0"
+description = "DhanDrishti quantitative engine and background workers"
+requires-python = ">=3.12"
+dependencies = [
+  "httpx>=0.28",
+  "numpy>=2.2",
+  "pandas>=2.2",
+  "psycopg[binary]>=3.2",
+]
+
+[dependency-groups]
+dev = ["pytest>=8.3"]
+
+[build-system]
+requires = ["hatchling"]
+build-backend = "hatchling.build"
+
+[tool.hatch.build.targets.wheel]
+packages = ["src/dhandrishti"]
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+addopts = "-q"

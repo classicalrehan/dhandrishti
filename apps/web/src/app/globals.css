@@ -1,0 +1,73 @@
+@import "tailwindcss";
+
+/*
+ * DhanDrishti design tokens (dark-first). Text tokens were checked for WCAG
+ * contrast on --color-surface (#0d1422): text 15.7, muted 7.0, faint 4.6,
+ * up 9.2, down 6.3, warn 10.1, info 9.1. Chart series (SMA 20/50/200) were
+ * validated with the dataviz palette validator on the same surface.
+ */
+@theme {
+  --color-bg: #070b14;
+  --color-surface: #0d1422;
+  --color-surface-2: #121b2d;
+  --color-surface-3: #18233a;
+  --color-line: rgb(255 255 255 / 0.08);
+  --color-line-strong: rgb(255 255 255 / 0.14);
+  --color-ink: #e8edf5;
+  --color-muted: #94a0b4;
+  --color-faint: #7c879c;
+  --color-up: #3ccf8a;
+  --color-down: #f26b74;
+  --color-warn: #f2b544;
+  --color-info: #4cc3f0;
+  --color-brand: #5eead4;
+  --color-brand-deep: #14b8a6;
+  --color-series-1: #3987e5;
+  --color-series-2: #d95926;
+  --color-series-3: #199e70;
+
+  --font-sans: var(--font-inter), system-ui, -apple-system, "Segoe UI", sans-serif;
+  --font-mono: var(--font-mono-face), ui-monospace, SFMono-Regular, monospace;
+}
+
+:root {
+  color-scheme: dark;
+}
+
+body {
+  background:
+    radial-gradient(1200px 600px at 10% -10%, rgb(20 184 166 / 0.06), transparent 60%),
+    radial-gradient(900px 500px at 100% 0%, rgb(56 189 248 / 0.05), transparent 60%),
+    var(--color-bg);
+  color: var(--color-ink);
+  font-family: var(--font-sans);
+  -webkit-font-smoothing: antialiased;
+}
+
+.num {
+  font-variant-numeric: tabular-nums;
+}
+
+:focus-visible {
+  outline: 2px solid var(--color-brand);
+  outline-offset: 2px;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  * {
+    animation: none !important;
+    transition: none !important;
+  }
+}
+
+/* Markdown answers from the research assistant. */
+.prose-dd > * + * { margin-top: 0.65em; }
+.prose-dd h1, .prose-dd h2, .prose-dd h3 { font-weight: 600; font-size: 0.95rem; margin-top: 1em; }
+.prose-dd ul { list-style: disc; padding-left: 1.25rem; }
+.prose-dd ol { list-style: decimal; padding-left: 1.25rem; }
+.prose-dd li + li { margin-top: 0.25em; }
+.prose-dd strong { font-weight: 600; color: var(--color-ink); }
+.prose-dd code { font-family: var(--font-mono); font-size: 0.85em; background: var(--color-surface-2); padding: 0.1em 0.3em; border-radius: 4px; }
+.prose-dd table { display: block; overflow-x: auto; border-collapse: collapse; font-size: 0.8rem; font-variant-numeric: tabular-nums; }
+.prose-dd th, .prose-dd td { border-bottom: 1px solid var(--color-line); padding: 0.35rem 0.6rem; text-align: left; white-space: nowrap; }
+.prose-dd th { color: var(--color-muted); font-weight: 500; }

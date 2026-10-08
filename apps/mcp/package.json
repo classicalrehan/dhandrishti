@@ -1,0 +1,26 @@
+{
+  "name": "@dd/mcp",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "bin": {
+    "dhandrishti-mcp": "./src/server.ts"
+  },
+  "scripts": {
+    "start": "tsx src/server.ts",
+    "typecheck": "tsc -p tsconfig.json",
+    "test": "vitest run"
+  },
+  "devDependencies": {
+    "@dd/api": "workspace:*",
+    "@types/node": "^22.20.5",
+    "tsx": "^4.23.15",
+    "vitest": "^4.1.11"
+  },
+  "dependencies": {
+    "@dd/ai": "workspace:*",
+    "@dd/contracts": "workspace:*",
+    "@modelcontextprotocol/sdk": "^1.32.1",
+    "zod": "^4.6.5"
+  }
+}

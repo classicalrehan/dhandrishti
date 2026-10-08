@@ -1,0 +1,40 @@
+# DhanDrishti local reverse proxy.
+#
+#   https://dhandrishti.test
+#     /v1/*, /health  ->  API  127.0.0.1:4000   (Fastify)
+#     everything else ->  web  127.0.0.1:3100   (Next.js; includes the dev live-reload websocket)
+#
+# The web app and the API share one origin, so the browser needs no CORS and the
+# address has no port. Run with:  pnpm proxy
+{
+	# Local development only: certificates come from Caddy's own local CA (no ACME, no internet).
+	local_certs
+	# Apache already owns port 80 on this machine, so do not open :80 for HTTP->HTTPS redirects.
+	auto_https disable_redirects
+	# Trust is installed explicitly with `pnpm proxy:trust`, never as a side effect of starting.
+	skip_install_trust
+	# 443 by default (needs the one-time setcap from install.sh); override for testing.
+	https_port {$DD_HTTPS_PORT:443}
+}
+
+{$DD_DOMAIN:dhandrishti.test} {
+	tls internal
+
+	@api path /v1/* /health
+	handle @api {
+		reverse_proxy {$DD_API_UPSTREAM:127.0.0.1:4000} {
+			# Stream research-assistant answers (Server-Sent Events) without buffering.
+			flush_interval -1
+		}
+	}
+
+	handle {
+		reverse_proxy {$DD_WEB_UPSTREAM:127.0.0.1:3100}
+	}
+
+	log {
+		output stderr
+		format console
+		level WARN
+	}
+}

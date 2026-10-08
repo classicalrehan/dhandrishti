@@ -1,0 +1,7 @@
+{
+  "name": "@dd/database",
+  "version": "0.1.0",
+  "private": true,
+  "description": "SQL migrations (source of truth for the schema). Applied by `dhandrishti.db.migrate`; TS repositories for the API will live here.",
+  "files": ["migrations"]
+}

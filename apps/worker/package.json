@@ -1,0 +1,9 @@
+{
+  "name": "@dd/worker",
+  "version": "0.1.0",
+  "private": true,
+  "scripts": {
+    "test": "uv run pytest",
+    "score": "uv run python -m dhandrishti.jobs.score_universe"
+  }
+}

@@ -1,0 +1,40 @@
+{
+  "name": "dhandrishti",
+  "private": true,
+  "packageManager": "pnpm@10.34.6",
+  "scripts": {
+    "dev": "turbo run dev --filter=@dd/api --filter=@dd/web",
+    "build": "turbo run build",
+    "test": "turbo run test",
+    "typecheck": "turbo run typecheck",
+    "infra:up": "docker compose up -d --wait",
+    "infra:down": "docker compose down",
+    "db:migrate": "cd apps/worker && uv run python -m dhandrishti.db.migrate",
+    "pipeline:daily": "cd apps/worker && uv run python -m dhandrishti.jobs.daily --as-of 2026-10-05",
+    "test:integration": "DD_TEST_DATABASE_URL=${DD_TEST_DATABASE_URL:-postgresql://dhandrishti:dhandrishti_dev@localhost:5432/postgres} DD_TEST_REDIS_URL=${DD_TEST_REDIS_URL:-redis://127.0.0.1:6379/15} turbo run test --filter=@dd/worker --filter=@dd/api",
+    "proxy:install": "infra/caddy/install.sh",
+    "proxy": "DD_DOMAIN=${DD_DOMAIN:-dhandrishti.test} .tools/caddy run --config infra/caddy/Caddyfile --adapter caddyfile",
+    "proxy:trust": "infra/caddy/trust.sh",
+    "backtest": "cd apps/worker && uv run python -m dhandrishti.jobs.backtest",
+    "kite:login": "cd apps/worker && uv run python -m dhandrishti.jobs.kite_login",
+    "db:create-kite": "docker compose exec -T postgres sh -c 'createdb -U \"$POSTGRES_USER\" dhandrishti_kite' && echo 'created database dhandrishti_kite'",
+    "pipeline:kite": "cd apps/worker && DD_DATABASE_URL=${DD_KITE_DATABASE_URL:-postgresql://dhandrishti:dhandrishti_dev@localhost:5432/dhandrishti_kite} uv run python -m dhandrishti.jobs.daily --source kite",
+    "backtest:kite": "cd apps/worker && DD_DATABASE_URL=${DD_KITE_DATABASE_URL:-postgresql://dhandrishti:dhandrishti_dev@localhost:5432/dhandrishti_kite} uv run python -m dhandrishti.jobs.backtest",
+    "dev:kite": "DD_DATABASE_URL=${DD_KITE_DATABASE_URL:-postgresql://dhandrishti:dhandrishti_dev@localhost:5432/dhandrishti_kite} turbo run dev --filter=@dd/api --filter=@dd/web",
+    "paper": "cd apps/worker && DD_DATABASE_URL=${DD_KITE_DATABASE_URL:-postgresql://dhandrishti:dhandrishti_dev@localhost:5432/dhandrishti_kite} uv run python -m dhandrishti.jobs.paper",
+    "paper:run": "cd apps/worker && DD_DATABASE_URL=${DD_KITE_DATABASE_URL:-postgresql://dhandrishti:dhandrishti_dev@localhost:5432/dhandrishti_kite} uv run python -m dhandrishti.jobs.paper run",
+    "daily:kite": "pnpm -s pipeline:kite && pnpm -s paper:run && pnpm -s holdings",
+    "rule-study": "cd apps/worker && DD_DATABASE_URL=${DD_KITE_DATABASE_URL:-postgresql://dhandrishti:dhandrishti_dev@localhost:5432/dhandrishti_kite} uv run python -m dhandrishti.jobs.rule_study",
+    "holdings": "cd apps/worker && DD_DATABASE_URL=${DD_KITE_DATABASE_URL:-postgresql://dhandrishti:dhandrishti_dev@localhost:5432/dhandrishti_kite} uv run python -m dhandrishti.jobs.holdings",
+    "dev:stop": "scripts/dev-stop.sh",
+    "fundamentals:import": "cd apps/worker && DD_DATABASE_URL=${DD_KITE_DATABASE_URL:-postgresql://dhandrishti:dhandrishti_dev@localhost:5432/dhandrishti_kite} uv run python -m dhandrishti.jobs.import_fundamentals"
+  },
+  "devDependencies": {
+    "turbo": "^2.11.7",
+    "typescript": "5.9.3",
+    "vitest": "^4.1.11"
+  },
+  "engines": {
+    "node": ">=22"
+  }
+}

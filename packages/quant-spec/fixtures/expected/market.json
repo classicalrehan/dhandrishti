@@ -1,0 +1,325 @@
+{
+ "as_of": "2026-10-05",
+ "regime": {
+  "regime": "BULLISH",
+  "composite": 77.6,
+  "confidence": 68,
+  "factors": [
+   {
+    "key": "index_trend",
+    "label": "Index Trend",
+    "weight": 25,
+    "score": 100.0
+   },
+   {
+    "key": "bank_nifty_trend",
+    "label": "Bank NIFTY Trend",
+    "weight": 10,
+    "score": 100.0
+   },
+   {
+    "key": "breadth",
+    "label": "Market Breadth",
+    "weight": 25,
+    "score": 75.0
+   },
+   {
+    "key": "volatility",
+    "label": "Volatility (India VIX)",
+    "weight": 15,
+    "score": 66.7
+   },
+   {
+    "key": "sector_participation",
+    "label": "Sector Participation",
+    "weight": 15,
+    "score": 40.0
+   },
+   {
+    "key": "index_momentum",
+    "label": "Index Momentum",
+    "weight": 10,
+    "score": 78.8
+   }
+  ],
+  "reason": "Bank NIFTY Trend and Index Trend are supportive; Sector Participation is the weakest factor."
+ },
+ "breadth": {
+  "advances": 0,
+  "declines": 44,
+  "unchanged": 0,
+  "advance_ratio": 0.0,
+  "pct_above_sma50": 0.7727,
+  "pct_above_sma200": 0.9545
+ },
+ "sectors": [
+  {
+   "sector": "Infra",
+   "score": 86,
+   "normalized": 0.8645,
+   "rank": 1,
+   "momentum": "Strong",
+   "breadth": "Positive",
+   "median_rs_nifty_3m": 5.2275,
+   "median_rs_nifty_1m": 1.353,
+   "pct_above_sma50": 1.0,
+   "median_profit_growth": 23.435,
+   "median_ret_1d": -2.8934,
+   "median_ret_1m": 1.956,
+   "members": [
+    "ADANIPORTS",
+    "LT"
+   ]
+  },
+  {
+   "sector": "Cement",
+   "score": 85,
+   "normalized": 0.8489,
+   "rank": 2,
+   "momentum": "Strong",
+   "breadth": "Positive",
+   "median_rs_nifty_3m": 13.3591,
+   "median_rs_nifty_1m": 2.8128,
+   "pct_above_sma50": 1.0,
+   "median_profit_growth": 7.855,
+   "median_ret_1d": -2.2394,
+   "median_ret_1m": 3.4157,
+   "members": [
+    "GRASIM",
+    "ULTRACEMCO"
+   ]
+  },
+  {
+   "sector": "Energy",
+   "score": 80,
+   "normalized": 0.7987,
+   "rank": 3,
+   "momentum": "Strong",
+   "breadth": "Positive",
+   "median_rs_nifty_3m": 6.3754,
+   "median_rs_nifty_1m": 2.1834,
+   "pct_above_sma50": 1.0,
+   "median_profit_growth": 8.47,
+   "median_ret_1d": -1.1575,
+   "median_ret_1m": 2.7863,
+   "members": [
+    "BPCL",
+    "ONGC",
+    "RELIANCE"
+   ]
+  },
+  {
+   "sector": "Pharma",
+   "score": 74,
+   "normalized": 0.7383,
+   "rank": 4,
+   "momentum": "Neutral",
+   "breadth": "Positive",
+   "median_rs_nifty_3m": 0.2356,
+   "median_rs_nifty_1m": 2.5151,
+   "pct_above_sma50": 1.0,
+   "median_profit_growth": 16.955,
+   "median_ret_1d": -0.8693,
+   "median_ret_1m": 3.1181,
+   "members": [
+    "CIPLA",
+    "DIVISLAB",
+    "DRREDDY",
+    "SUNPHARMA"
+   ]
+  },
+  {
+   "sector": "Financial Services",
+   "score": 63,
+   "normalized": 0.6325,
+   "rank": 5,
+   "momentum": "Weak",
+   "breadth": "Positive",
+   "median_rs_nifty_3m": -4.0669,
+   "median_rs_nifty_1m": 2.6357,
+   "pct_above_sma50": 1.0,
+   "median_profit_growth": 16.825,
+   "median_ret_1d": -2.3719,
+   "median_ret_1m": 3.2387,
+   "members": [
+    "BAJAJFINSV",
+    "BAJFINANCE",
+    "HDFCLIFE",
+    "SBILIFE"
+   ]
+  },
+  {
+   "sector": "Consumer Durables",
+   "score": 46,
+   "normalized": 0.4565,
+   "rank": 6,
+   "momentum": "Neutral",
+   "breadth": "Mixed",
+   "median_rs_nifty_3m": -2.677,
+   "median_rs_nifty_1m": -2.2636,
+   "pct_above_sma50": 0.5,
+   "median_profit_growth": 25.82,
+   "median_ret_1d": -3.129,
+   "median_ret_1m": -1.6606,
+   "members": [
+    "ASIANPAINT",
+    "TITAN"
+   ]
+  },
+  {
+   "sector": "FMCG",
+   "score": 43,
+   "normalized": 0.4284,
+   "rank": 7,
+   "momentum": "Weak",
+   "breadth": "Positive",
+   "median_rs_nifty_3m": -5.0459,
+   "median_rs_nifty_1m": -2.5262,
+   "pct_above_sma50": 0.75,
+   "median_profit_growth": 13.775,
+   "median_ret_1d": -2.1226,
+   "median_ret_1m": -1.9233,
+   "members": [
+    "BRITANNIA",
+    "HINDUNILVR",
+    "ITC",
+    "NESTLEIND"
+   ]
+  },
+  {
+   "sector": "Telecom",
+   "score": 43,
+   "normalized": 0.4253,
+   "rank": 8,
+   "momentum": "Weak",
+   "breadth": "Positive",
+   "median_rs_nifty_3m": -11.4505,
+   "median_rs_nifty_1m": -2.9865,
+   "pct_above_sma50": 1.0,
+   "median_profit_growth": 27.83,
+   "median_ret_1d": -4.6117,
+   "median_ret_1m": -2.3835,
+   "members": [
+    "BHARTIARTL"
+   ]
+  },
+  {
+   "sector": "Power",
+   "score": 39,
+   "normalized": 0.3949,
+   "rank": 9,
+   "momentum": "Neutral",
+   "breadth": "Mixed",
+   "median_rs_nifty_3m": -2.2355,
+   "median_rs_nifty_1m": 0.5909,
+   "pct_above_sma50": 0.5,
+   "median_profit_growth": 5.605,
+   "median_ret_1d": -1.1511,
+   "median_ret_1m": 1.1938,
+   "members": [
+    "NTPC",
+    "POWERGRID"
+   ]
+  },
+  {
+   "sector": "Realty",
+   "score": 38,
+   "normalized": 0.3803,
+   "rank": 10,
+   "momentum": "Weak",
+   "breadth": "Mixed",
+   "median_rs_nifty_3m": -5.2695,
+   "median_rs_nifty_1m": 1.7131,
+   "pct_above_sma50": 0.5,
+   "median_profit_growth": 8.92,
+   "median_ret_1d": -3.8428,
+   "median_ret_1m": 2.316,
+   "members": [
+    "DLF",
+    "GODREJPROP"
+   ]
+  },
+  {
+   "sector": "Banking",
+   "score": 36,
+   "normalized": 0.3606,
+   "rank": 11,
+   "momentum": "Weak",
+   "breadth": "Mixed",
+   "median_rs_nifty_3m": -3.7838,
+   "median_rs_nifty_1m": -3.3426,
+   "pct_above_sma50": 0.5,
+   "median_profit_growth": 15.875,
+   "median_ret_1d": -2.9294,
+   "median_ret_1m": -2.7396,
+   "members": [
+    "AXISBANK",
+    "HDFCBANK",
+    "ICICIBANK",
+    "INDUSINDBK",
+    "KOTAKBANK",
+    "SBIN"
+   ]
+  },
+  {
+   "sector": "Auto",
+   "score": 34,
+   "normalized": 0.3361,
+   "rank": 12,
+   "momentum": "Weak",
+   "breadth": "Positive",
+   "median_rs_nifty_3m": -4.6601,
+   "median_rs_nifty_1m": -1.894,
+   "pct_above_sma50": 1.0,
+   "median_profit_growth": -0.84,
+   "median_ret_1d": -1.6629,
+   "median_ret_1m": -1.291,
+   "members": [
+    "BAJAJ-AUTO",
+    "EICHERMOT",
+    "M&M",
+    "MARUTI"
+   ]
+  },
+  {
+   "sector": "IT",
+   "score": 30,
+   "normalized": 0.2954,
+   "rank": 13,
+   "momentum": "Weak",
+   "breadth": "Positive",
+   "median_rs_nifty_3m": -5.2772,
+   "median_rs_nifty_1m": -2.4872,
+   "pct_above_sma50": 0.6,
+   "median_profit_growth": 6.95,
+   "median_ret_1d": -3.1903,
+   "median_ret_1m": -1.8842,
+   "members": [
+    "HCLTECH",
+    "INFY",
+    "TCS",
+    "TECHM",
+    "WIPRO"
+   ]
+  },
+  {
+   "sector": "Metal",
+   "score": 29,
+   "normalized": 0.2883,
+   "rank": 14,
+   "momentum": "Neutral",
+   "breadth": "Positive",
+   "median_rs_nifty_3m": -2.3361,
+   "median_rs_nifty_1m": -4.5202,
+   "pct_above_sma50": 0.6667,
+   "median_profit_growth": -3.61,
+   "median_ret_1d": -3.4115,
+   "median_ret_1m": -3.9172,
+   "members": [
+    "HINDALCO",
+    "JSWSTEEL",
+    "TATASTEEL"
+   ]
+  }
+ ]
+}
