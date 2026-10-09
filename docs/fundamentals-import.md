@@ -1,5 +1,9 @@
 # Importing real fundamentals
 
+> **Two stores.** This importer writes the production `fundamentals` table (one derived snapshot per
+> publication date; re-importing overwrites). The point-in-time research store is separate and
+> append-only: see [fundamentals-pit.md](fundamentals-pit.md). Scoring reads only this table today.
+
 Kite Connect has prices only, so Fundamental Quality (25), Earnings Growth (20) and Valuation (10)
 are neutral for every stock until company financials are imported. This importer reads two CSV
 files from any source (Screener.in export, TrueData, NSE filings typed up by hand) into the Kite

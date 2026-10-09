@@ -11,3 +11,5 @@ __pycache__
 .pytest_cache
 next-env.d.ts
 .tools
+.research/
+data/

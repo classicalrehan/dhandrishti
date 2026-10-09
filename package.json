@@ -24,6 +24,8 @@
     "paper": "cd apps/worker && DD_DATABASE_URL=${DD_KITE_DATABASE_URL:-postgresql://dhandrishti:dhandrishti_dev@localhost:5432/dhandrishti_kite} uv run python -m dhandrishti.jobs.paper",
     "paper:run": "cd apps/worker && DD_DATABASE_URL=${DD_KITE_DATABASE_URL:-postgresql://dhandrishti:dhandrishti_dev@localhost:5432/dhandrishti_kite} uv run python -m dhandrishti.jobs.paper run",
     "daily:kite": "pnpm -s pipeline:kite && pnpm -s paper:run && pnpm -s holdings",
+    "pit": "cd apps/worker && DD_DATABASE_URL=${DD_KITE_DATABASE_URL:-postgresql://dhandrishti:dhandrishti_dev@localhost:5432/dhandrishti_kite} uv run python -m dhandrishti.jobs.pit_fundamentals",
+    "factor-study": "cd apps/worker && DD_DATABASE_URL=${DD_KITE_DATABASE_URL:-postgresql://dhandrishti:dhandrishti_dev@localhost:5432/dhandrishti_kite} uv run python -m dhandrishti.jobs.factor_study",
     "rule-study": "cd apps/worker && DD_DATABASE_URL=${DD_KITE_DATABASE_URL:-postgresql://dhandrishti:dhandrishti_dev@localhost:5432/dhandrishti_kite} uv run python -m dhandrishti.jobs.rule_study",
     "holdings": "cd apps/worker && DD_DATABASE_URL=${DD_KITE_DATABASE_URL:-postgresql://dhandrishti:dhandrishti_dev@localhost:5432/dhandrishti_kite} uv run python -m dhandrishti.jobs.holdings",
     "dev:stop": "scripts/dev-stop.sh",
