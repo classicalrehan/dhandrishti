@@ -35,4 +35,5 @@ unchanged code and data takes seconds; any change to code, config or data rebuil
 - [2026-10 Phase 1 audit](2026-10-phase1-audit.md)
 - [2026-10 Rule study](2026-10-rule-study.md)
 - [2026-10 Price-factor study](2026-10-price-factor-study.md)
-- [2026-10 Fundamentals pilot](2026-10-fundamentals-pilot.md) (foundation built; data pending)
+- [2026-10 Fundamentals pilot](2026-10-fundamentals-pilot.md) (2 of 20 stocks; 32 filings imported)
+- [2026-10 Fundamentals validation](2026-10-fundamentals-validation.md) (read-only checks of the import)

@@ -1,6 +1,7 @@
 # Fundamentals pilot, October 2026
 
-**Status: foundation built and tested; pilot data not yet collected.** No real company figures are in
+**Status (2026-10-09): foundation built and tested; pilot data for 2 of 20 stocks collected; 32 filings
+(285 observations) imported after approval.** (Original status line, 2026-10-08: foundation built, no data.) No real company figures are in
 the store, so no data-quality result below is a measurement of real data unless it says so. Nothing here
 claims point-in-time safety for any source yet.
 
@@ -309,6 +310,21 @@ Received: `SHP_1652323_16042026045034_WEB.xml` and `SHP_1693581_15072026065242_W
   are a 12-hour clock without AM/PM (`..._16042026045034_...` was published 16-Apr-2026 16:50).
 - Every XBRL matched its listing row; as-on dates agree; **the listing's promoter % equals the XBRL's in all 15**.
   Publication 7–21 days after the as-on date (SEBI deadline 21 days). All 15 ready to import (dry run).
+
+## 5d. Import into the real database (2026-10-09, approved)
+Imported into `dhandrishti_kite` with `pnpm pit xbrl ... --import` (17 results files named explicitly, without
+`--accept-warnings`) and `pnpm pit shp ... --import` (15 shareholding files).
+- 32 import batches (file name and SHA-256 recorded), **285 observations**: 225 from results, 60 from
+  shareholding. All `data_version` 1, no restatements, all `EXCHANGE_TIMESTAMP` / `AS_REPORTED`, none without
+  `available_at`. The 4 held-back HDFCBANK files contributed 0 rows. Append-only triggers active.
+- Listing CSVs are not stored as rows: they supplied each observation's `reported_at` / `available_at`.
+- Point-in-time checks on the stored data, all pass: each result is invisible to the decision on its
+  publication day (all published after 15:30) and visible from the next session (INFY 16-Jan-2025 and
+  17-Apr-2025 → 21-Apr-2025 after Good Friday; HDFCBANK 16-Jan-2024 and 21-Apr-2025); the held-back HDFCBANK
+  consolidated Mar-25 profit is never visible; INFY's latest promoter holding switches from the Dec-25 to the
+  Mar-26 filing between 16 and 17-Apr-2026 and to the 04-Dec-2025 buyback filing on 12-Dec-2025; nothing is
+  visible before the first filing; "what DhanDrishti had stored" on 08-Oct-2026 returns nothing.
+- Production scoring is untouched: the `fundamentals` table still has 0 rows.
 
 ## 6. Fields expected to be hard to reconstruct point-in-time (to verify in the pilot)
 These are expectations from how Indian filings work, not measurements.
