@@ -6,6 +6,8 @@ import pg from "pg";
 import { buildApp } from "./app";
 import { type Cache, NoCache, RedisCache } from "./cache/cache";
 import { loadConfig } from "./config";
+import { sessionFilePath } from "./live/kite-session";
+import { LiveQuoteService } from "./live/live-quote-service";
 import { PgMarketRepository } from "./repositories/pg-market-repository";
 
 const config = loadConfig();
@@ -42,6 +44,17 @@ function databaseName(url: string): string {
   return url.match(/^postgres(?:ql)?:\/\/[^/]*\/([^?]+)/)?.[1] ?? "default";
 }
 
+// Read-only live quotes: one connection owned by this process, started after the server listens.
+const liveService = config.live.enabled
+  ? new LiveQuoteService({
+      watchlist: config.live.watchlist,
+      sessionFile: config.live.sessionFile ?? sessionFilePath(),
+      maxSymbols: config.live.maxSymbols,
+      // Used only after start() (below app creation); never given credentials or ticks.
+      log: { info: (obj, msg) => app.log.info(obj, msg), warn: (obj, msg) => app.log.warn(obj, msg) },
+    })
+  : null;
+
 const app = await buildApp({
   repo: new PgMarketRepository(pool),
   cache,
@@ -50,12 +63,14 @@ const app = await buildApp({
   ai: aiEnabled ? { client: new Anthropic(), rateLimitMax: config.aiRateLimitMax } : undefined,
   corsOrigins: config.corsOrigins,
   trustProxy: config.trustProxy,
+  live: { source: liveService, watchlist: config.live.watchlist, freshSeconds: config.live.freshSeconds },
   logger: true,
 });
 warn = (obj, msg) => app.log.warn(obj, msg);
 app.log.info({ ai: aiEnabled ? "enabled" : "disabled (set ANTHROPIC_API_KEY or DD_AI=on)" }, "research assistant");
 
 const shutdown = async () => {
+  await liveService?.stop();
   await app.close();
   await pool.end();
   redis?.disconnect();
@@ -65,6 +80,11 @@ process.on("SIGINT", shutdown);
 process.on("SIGTERM", shutdown);
 
 await app.listen({ port: config.port, host: config.host });
+app.log.info(
+  { live: liveService ? `on (${config.live.watchlist.length} symbols)` : "off (set DD_LIVE_WATCHLIST)" },
+  "live market data",
+);
+void liveService?.start();
 
 // Warn (don't fail) when the database is behind the code's migrations.
 try {

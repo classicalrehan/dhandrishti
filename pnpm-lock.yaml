@@ -32,6 +32,9 @@ importers:
       '@dd/contracts':
         specifier: workspace:*
         version: link:../../packages/contracts
+      '@dd/shared':
+        specifier: workspace:*
+        version: link:../../packages/shared
       '@fastify/cors':
         specifier: ^11.3.0
         version: 11.3.0

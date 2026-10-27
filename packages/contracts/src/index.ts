@@ -565,6 +565,64 @@ export const ApiError = z.object({
   error: z.object({ code: z.string(), message: z.string() }),
 });
 
+// ------------------------------------------------------------------ live quotes (read-only market data)
+
+/**
+ * Backend connection to the Kite ticker. NOT_CONFIGURED: no watchlist; AUTH_REQUIRED: the Kite session is
+ * missing, expired (6 AM IST daily) or rejected, so no retries until `pnpm kite:login`.
+ */
+export const LiveConnectionStatus = z.enum([
+  "DISABLED", "NOT_CONFIGURED", "AUTH_REQUIRED", "CONNECTING", "CONNECTED", "RECONNECTING", "STOPPED",
+]);
+/** FRESH: updated within the threshold on a live connection. QUIET: connected, but no update recently (thin
+ *  trading or market closed). STALE: kept from an earlier connection or day; not current. */
+export const QuoteFreshness = z.enum(["FRESH", "QUIET", "STALE", "UNAVAILABLE"]);
+export const SessionStatus = z.enum(["PRE_OPEN", "OPEN", "CLOSED", "HOLIDAY", "WEEKEND", "UNKNOWN"]);
+
+export const LiveQuote = z.object({
+  symbol: z.string(),
+  exchange: z.literal("NSE"),
+  instrument_token: z.number().int().nullable(),
+  source: z.enum(["LIVE", "EOD", "NONE"]),
+  ltp: num,
+  prev_close: num,
+  day_open: num,
+  day_high: num,
+  day_low: num,
+  volume: z.number().int().nullable(),
+  /** Exchange time of the last trade; null in quote mode (Kite sends it only in full mode). */
+  exchange_time: z.string().nullable(),
+  /** When this server received the tick. */
+  received_at: z.string().nullable(),
+  /** Trading date of the end-of-day close shown when source is EOD. */
+  eod_date: isoDate.nullable(),
+  freshness: QuoteFreshness,
+  age_seconds: num,
+  note: z.string().nullable(),
+});
+
+export const LiveConnection = z.object({
+  status: LiveConnectionStatus,
+  /** Non-sensitive explanation (never credentials). */
+  reason: z.string().nullable(),
+  connected_since: z.string().nullable(),
+  last_tick_at: z.string().nullable(),
+  last_error: z.enum(["NETWORK", "AUTH", "PROTOCOL", "CONFIG"]).nullable(),
+  reconnect_attempts: z.number().int(),
+  subscribed: z.number().int(),
+  unresolved: z.array(z.string()),
+});
+
+export const LiveQuotes = z.object({
+  generated_at: z.string(),
+  mode: z.literal("quote"),
+  freshness_seconds: z.number(),
+  session: z.object({ status: SessionStatus, calendar_known: z.boolean() }),
+  connection: LiveConnection,
+  fresh_quotes: z.number().int(),
+  quotes: z.array(LiveQuote),
+});
+
 // ------------------------------------------------------------------ query params
 
 export const OpportunitiesQuery = z.object({
@@ -642,6 +700,12 @@ export type HoldingsPoint = z.infer<typeof HoldingsPoint>;
 export type HoldingsView = z.infer<typeof HoldingsView>;
 export type ScoringConfigSummary = z.infer<typeof ScoringConfigSummary>;
 export type OpportunitiesQuery = z.infer<typeof OpportunitiesQuery>;
+export type LiveQuote = z.infer<typeof LiveQuote>;
+export type LiveQuotes = z.infer<typeof LiveQuotes>;
+export type LiveConnection = z.infer<typeof LiveConnection>;
+export type LiveConnectionStatus = z.infer<typeof LiveConnectionStatus>;
+export type QuoteFreshness = z.infer<typeof QuoteFreshness>;
+export type SessionStatus = z.infer<typeof SessionStatus>;
 export type Envelope<T> = { data: T; meta: Meta };
 
 export const RISK_ORDER: RiskLevel[] = ["LOW", "MEDIUM", "HIGH", "VERY_HIGH"];

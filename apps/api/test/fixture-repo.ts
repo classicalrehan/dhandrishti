@@ -170,4 +170,15 @@ export class FixtureRepo implements MarketRepository {
       }))
       .filter((r) => from == null || r.date >= from);
   }
+  async latestCloses(symbols: string[]) {
+    this.count("latestCloses");
+    const dates = inputs.dates as string[];
+    return inputs.stocks
+      .filter((x: { security: { symbol: string } }) => symbols.includes(x.security.symbol))
+      .map((x: { security: { symbol: string }; bars: Cols }) => ({
+        symbol: x.security.symbol,
+        date: dates[dates.length - 1]!,
+        close: x.bars.close[dates.length - 1]!,
+      }));
+  }
 }

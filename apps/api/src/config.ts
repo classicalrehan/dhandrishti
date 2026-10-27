@@ -15,6 +15,18 @@ export interface ApiConfig {
   /** auto: on when ANTHROPIC_API_KEY or ANTHROPIC_AUTH_TOKEN is set; on: always (e.g. `ant auth login` profile); off. */
   aiMode: "auto" | "on" | "off";
   aiRateLimitMax: number;
+  live: LiveConfig;
+}
+
+export interface LiveConfig {
+  /** On when a watchlist is set, unless DD_LIVE=off. */
+  enabled: boolean;
+  watchlist: string[];
+  /** A live quote older than this (while connected) is shown as QUIET, not FRESH. */
+  freshSeconds: number;
+  maxSymbols: number;
+  /** Kite session written by `pnpm kite:login`; null = the worker's default location. */
+  sessionFile: string | null;
 }
 
 /** Where the web app may be opened locally: the dhandrishti.test domain, localhost, or the loopback IP. */
@@ -38,5 +50,20 @@ export function loadConfig(env: NodeJS.ProcessEnv = process.env): ApiConfig {
     aiRateLimitMax: Number(env.DD_AI_RATE_LIMIT_MAX ?? 10),
     trustProxy: env.DD_TRUST_PROXY === "false" ? false : (env.DD_TRUST_PROXY ?? "loopback"),
     corsOrigins: (env.DD_WEB_ORIGIN ?? DEFAULT_WEB_ORIGINS).split(",").map((s) => s.trim()),
+    live: loadLiveConfig(env),
+  };
+}
+
+export function loadLiveConfig(env: NodeJS.ProcessEnv = process.env): LiveConfig {
+  const watchlist = [
+    ...new Set((env.DD_LIVE_WATCHLIST ?? "").split(",").map((s) => s.trim().toUpperCase()).filter((s) => /^[A-Z0-9&-]{1,20}$/.test(s))),
+  ];
+  const positive = (v: string | undefined, dflt: number) => (Number(v) > 0 ? Number(v) : dflt);
+  return {
+    enabled: env.DD_LIVE !== "off" && watchlist.length > 0,
+    watchlist,
+    freshSeconds: positive(env.DD_LIVE_FRESH_SECONDS, 60),
+    maxSymbols: Math.min(positive(env.DD_LIVE_MAX_SYMBOLS, 50), 500),
+    sessionFile: env.DD_KITE_SESSION_FILE ?? null,
   };
 }

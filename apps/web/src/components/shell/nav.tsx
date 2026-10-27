@@ -31,7 +31,7 @@ const NAV = [
   { href: "/risk", label: "Risk Radar", Icon: Radar },
   { href: "/screener", label: "Stock Screener", Icon: SlidersHorizontal, soon: true },
   { href: "/signals", label: "Smart Signals", Icon: Zap, soon: true },
-  { href: "/watchlist", label: "Watchlist", Icon: Eye, soon: true },
+  { href: "/watchlist", label: "Watchlist", Icon: Eye },
   { href: "/research", label: "AI Research", Icon: Bot },
   { href: "/backtest", label: "Backtesting", Icon: FlaskConical },
   { href: "/paper", label: "Paper Trading", Icon: Wallet },

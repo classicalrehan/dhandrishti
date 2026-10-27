@@ -206,6 +206,16 @@ export class PgMarketRepository implements MarketRepository {
     return rows;
   }
 
+  async latestCloses(symbols: string[]) {
+    if (!symbols.length) return [];
+    const { rows } = await this.pool.query(
+      `SELECT DISTINCT ON (symbol) symbol, trade_date AS date, close
+       FROM daily_prices WHERE symbol = ANY($1) ORDER BY symbol, trade_date DESC`,
+      [symbols],
+    );
+    return rows;
+  }
+
   async paperPortfolios(): Promise<PaperSummary[]> {
     const { rows } = await this.pool.query(`${PAPER_SUMMARY_SQL} ORDER BY (p.status = 'CLOSED'), p.id`);
     return rows.map(toPaperSummary);

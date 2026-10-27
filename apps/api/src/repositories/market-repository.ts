@@ -78,6 +78,8 @@ export interface MarketRepository {
   fundamentals(symbol: string, asOf: string): Promise<FundamentalsRow | null>;
   events(symbol: string, after: string, until: string): Promise<CorporateEvent[]>;
   prices(symbol: string, asOf: string, from: string | null): Promise<PriceRow[]>;
+  /** Latest stored end-of-day close for each symbol that has one. */
+  latestCloses(symbols: string[]): Promise<{ symbol: string; date: string; close: number }[]>;
   /** Most recent backtest runs first. */
   backtestRuns(limit: number): Promise<BacktestRunSummary[]>;
   backtest(id: number): Promise<BacktestDetail | null>;

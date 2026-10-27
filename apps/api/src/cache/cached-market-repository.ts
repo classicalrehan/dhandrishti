@@ -73,6 +73,11 @@ export class CachedMarketRepository implements MarketRepository {
     return this.inner.ping();
   }
 
+  latestCloses(symbols: string[]) {
+    const key = `closes:${[...symbols].sort().join(",")}`;
+    return this.through(key, CACHE_TTL.timeSeries, () => this.inner.latestCloses(symbols));
+  }
+
   latestRun(onOrBefore?: string) {
     if (onOrBefore) return this.inner.latestRun(onOrBefore);
     return this.through("latest-run", CACHE_TTL.latestRun, () => this.inner.latestRun());

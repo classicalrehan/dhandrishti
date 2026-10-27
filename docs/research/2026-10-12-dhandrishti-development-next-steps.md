@@ -303,9 +303,10 @@ No company is onboarded until its files are imported and checked.
 Still incomplete: 18 companies; 540 INFY/HDFCBANK values unverified (the 8 results PDFs of section 3e can come in any
 later session); insurance/NBFC mappings; flag-disposition and promotion decisions (section 6); uncommitted work.
 
-## 8. Single recommended next action (updated 2026-10-27, after section 9j)
-**Current:** decide the next research direction (section 9j): technical entry timing showed no edge on the
-survivorship-free universe.
+## 8. Single recommended next action (updated 2026-10-27, after section 9k)
+**Current:** observe the live watchlist during one market session (section 9k: set `DD_LIVE_WATCHLIST`, run
+`pnpm kite:login` and the API, open /watchlist) to confirm FRESH ticks, reconnects and the 15:30 transition; the
+research direction after 9j is still open.
 The text below is the original 2026-10-15 action, already completed (9a).
 
 **Save two NSE Indices press releases from your browser into `~/Downloads`** (open each link, then save the PDF):
@@ -634,3 +635,83 @@ You decided to stop the notice hunt and use the verified 2021–2026 membership.
   needs a Kite session.
 - Tests: `tests/test_pit_universe.py` (3, new) and `tests/test_entry_signals.py` (7: 2 new, membership filter
   and control, verdict periods).
+
+### 9k. Read-only live quotes (Kite WebSocket) for a small watchlist (2026-10-27)
+Infrastructure only: live prices do not touch scoring, recommendations, paper trading or research results, and
+they are not evidence of any edge (9j still holds). There is no order, GTT or trade path.
+- **What existed:**
+  - Kite was used only from Python, over REST: end-of-day candles, holdings, and a daily login writing
+    `~/.config/dhandrishti/kite_session.json` (token valid until 6 AM IST).
+  - There was no WebSocket client and no quote service.
+  - Instrument tokens are not stored anywhere; the authoritative mapping is Kite's daily instrument master.
+  - The Fastify API is local-only (loopback, CORS, rate limits, GET data routes, no user auth). Redis is a
+    fail-open read-through cache.
+  - `@dd/shared` has the NSE session and holiday calendar (holidays for 2026 only).
+  - The web app had a "Watchlist (soon)" nav entry.
+- **Implemented (API):**
+  - `apps/api/src/live/ticker-packets.ts`: the Kite binary protocol parser (ltp, quote and full packets; paise;
+    rejects non-equity segments, zero prices and malformed packets).
+  - `apps/api/src/live/kite-session.ts`: reuses the worker's session file, with the 6 AM expiry check,
+    `/user/profile` check and the NSE instrument master.
+  - `apps/api/src/live/live-quote-service.ts`: one idempotent connection with quote-mode subscription
+    (deduplicated tokens, no depth). It has:
+    - a 15 s heartbeat watchdog;
+    - backoff from 1 s to 60 s with jitter, and the attempt counter reset after 30 s stable;
+    - a session re-check every third failed attempt, stopping as AUTH_REQUIRED instead of looping;
+    - out-of-order guard on exchange timestamps;
+    - clean `stop()`.
+  - `apps/api/src/live/quote-view.ts` and `apps/api/src/routes/live.ts`: `GET /v1/live/quotes`. The
+    `symbols` filter must be in the watchlist. Responses are `no-store` and always include source,
+    timestamps, freshness, session and connection health.
+  - `/health` reports `live.status`.
+  - `latestCloses` was added to the repositories (one query) for the end-of-day fallback.
+  - Contracts are in `packages/contracts` (`LiveQuotes`); settings are in `.env.example`.
+- **Implemented (web):** `/watchlist` page (nav enabled), `components/watchlist/live-quotes.tsx`, and
+  `lib/live-view.ts`.
+  - Polls every 5 s while the tab is visible, with one request for the whole list.
+  - Times are shown in IST.
+  - "Live", "End of day" and "No data" badges, with Fresh / No recent trade / Stale.
+  - The price change is shown in neutral colours, not as a buy/sell signal.
+- **Cache design:** the latest quote per subscribed token is kept in memory by the API process that owns the
+  socket.
+  - It is bounded (ticks for other tokens are ignored) and nothing is persisted.
+  - Redis is not used for quotes: with one API process it adds a failure mode without a reader that needs it.
+    Quotes therefore keep working when Redis is down (tested); Redis still caches the end-of-day lookup.
+  - Moving to Redis is the extension point if several API processes or the worker ever need the quotes.
+- **Freshness rules:**
+  - **FRESH:** connected, received today, within `DD_LIVE_FRESH_SECONDS` (60), and the session is open or
+    pre-open.
+  - **QUIET:** connected but no recent update, including after the close, when Kite sends a snapshot on
+    subscribe.
+  - **STALE:** held from an earlier connection or day.
+  - **End of day:** shown when there is no live quote or when the stored close is at least as recent; labelled
+    with its date, never as live.
+  - Session UNKNOWN when the holiday file does not cover the year.
+- **Configuration:** `DD_LIVE_WATCHLIST=RELIANCE,TCS,...`. Unset means off. Also `DD_LIVE=off`,
+  `DD_LIVE_MAX_SYMBOLS` (50) and `DD_KITE_SESSION_FILE`. No database migration.
+- **Entitlement:** WebSocket streaming works with the current Kite Connect app and session; verified below.
+  Nothing was purchased or changed.
+- **Live verification (19:56–19:58 IST, market closed):**
+  - A real connection with today's session subscribed 2 instruments and received one snapshot quote each in
+    about 0.3 s: RELIANCE ₹1,196.20 (previous close ₹1,201.80) and TCS ₹2,496.90. The unknown symbol was
+    reported, and `stop()` ended cleanly.
+  - The real API (port 4099, `dhandrishti_kite` read-only) returned 200 with `no-store`, `/health` showed
+    `live: CONNECTED`, and an outside symbol returned 400.
+  - Today's stored close (27-Oct) was preferred and labelled "End of day".
+  - The access token appeared 0 times in the server log or the response.
+  - That run found and fixed one issue: after-close snapshots had been labelled FRESH.
+  - **Not yet observed during market hours.**
+- **Tests (actual):**
+  - API `vitest` with Postgres and Redis integration: **69 passed**. That includes `test/live.test.ts` (22:
+    parser, session, config, connect, dedupe, mapping gaps, out-of-order, protocol error, reconnect and
+    resubscribe, silence watchdog, auth stop, shutdown, freshness, fallback, session, route validation,
+    database and Redis down, no secrets), plus a `latestCloses` integration test.
+  - Web `vitest`: **5 passed** (`lib/live-view.test.ts`).
+  - `npx turbo run typecheck test`: **14/14**.
+  - Worker full suite (before this task, unchanged since): 351 passed.
+- **Limitations:**
+  - Quote mode has no exchange timestamp, so `exchange_time` is null and the receive time is shown. Full mode
+    has it, at the cost of depth data.
+  - The watchlist is set at API start (restart to change).
+  - No candles are built: no consumer needs them yet.
+  - UI component rendering is not tested (no React testing library installed); the display rules are tested.

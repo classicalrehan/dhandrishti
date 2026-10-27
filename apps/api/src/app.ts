@@ -12,6 +12,7 @@ import { type Cache, NoCache } from "./cache/cache";
 import { CachedMarketRepository } from "./cache/cached-market-repository";
 import { AppError } from "./errors";
 import type { MarketRepository } from "./repositories/market-repository";
+import { type LiveDeps, liveRoutes } from "./routes/live";
 import { type ResearchDeps, researchRoutes } from "./routes/research";
 import { v1Routes } from "./routes/v1";
 import { MarketService } from "./services/market-service";
@@ -36,6 +37,8 @@ export interface AppDeps {
   /** Research assistant (Claude). Omitted: the endpoint answers 503 AI_DISABLED. */
   ai?: ResearchDeps;
   corsOrigins?: string[];
+  /** Read-only live quotes. Omitted: the live endpoint reports DISABLED with an empty watchlist. */
+  live?: LiveDeps;
   logger?: boolean;
   now?: () => Date;
 }
@@ -48,6 +51,7 @@ export async function buildApp({
   ai,
   trustProxy = false,
   corsOrigins = [],
+  live = { source: null, watchlist: [], freshSeconds: 60 },
   logger = false,
   now,
 }: AppDeps): Promise<FastifyInstance> {
@@ -109,16 +113,19 @@ export async function buildApp({
   app.get("/health", { config: { rateLimit: false } }, async (_req, reply) => {
     const cacheStatus = await cache.status();
     const cacheInfo = { status: cacheStatus, hits: repo.counters.hits, misses: repo.counters.misses };
+    // Live data is optional: its state is reported, never allowed to fail the health check.
+    const liveInfo = { status: live.source?.state().status ?? "DISABLED" };
     try {
       await repo.ping();
-      return { status: "ok", database: "ok", cache: cacheInfo };
+      return { status: "ok", database: "ok", cache: cacheInfo, live: liveInfo };
     } catch {
-      return reply.code(503).send({ status: "degraded", database: "unreachable", cache: cacheInfo });
+      return reply.code(503).send({ status: "degraded", database: "unreachable", cache: cacheInfo, live: liveInfo });
     }
   });
 
   const service = new MarketService(repo, now);
   await app.register(v1Routes(service), { prefix: "/v1" });
   await app.register(researchRoutes(service, ai), { prefix: "/v1" });
+  await app.register(liveRoutes(repo, live, now), { prefix: "/v1" });
   return app;
 }

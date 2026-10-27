@@ -91,6 +91,14 @@ describe.skipIf(!ADMIN_URL)("API on a real pipeline-populated database", () => {
     expect(last.rsi14).not.toBeNull();
   });
 
+  it("finds the latest stored close per symbol for the live-quote fallback", async () => {
+    const repo = new PgMarketRepository(pool);
+    const rows = await repo.latestCloses(["HDFCBANK", "NOSUCHSYMBOL"]);
+    const { body } = await get("/v1/stocks/HDFCBANK/prices?range=1M");
+    expect(rows).toEqual([{ symbol: "HDFCBANK", date: "2026-10-05", close: body.data.bars.at(-1).close }]);
+    expect(await repo.latestCloses([])).toEqual([]);
+  });
+
   it("serves a backtest the worker stored, within the contract", async () => {
     const list = await get("/v1/backtests");
     expect(list.status).toBe(200);
