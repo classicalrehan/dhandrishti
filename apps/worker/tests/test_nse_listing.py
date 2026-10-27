@@ -78,7 +78,7 @@ IHEAD = ("﻿SYMBOL ,COMPANY NAME ,QUARTER END DATE ,TYPE OF SUBMISSION ,AUDITED
          "EXCHANGE DISSEMINATION TIME ,TIME TAKEN \n")
 IROW = ('"{sym}","Test Co Limited","31-MAR-2025","{sub}","Audited","{basis}",'
         '"https://nsearchives.nseindia.com/corporate/ixbrl/X_iXBRL_WEB.html",'
-        '"https://nsearchives.nseindia.com/corporate/xbrl/{file}","17-Apr-2025 23:30:35","{rev}","{rem}",'
+        '"https://nsearchives.nseindia.com/corporate/xbrl/{file}","{bc}","{rev}","{rem}",'
         '"17-Apr-2025 23:36:34","00:00:01"\n')
 
 
@@ -86,7 +86,8 @@ def integrated(tmp_path, *rows):
     p = tmp_path / "CF-Integrated-Filing-equities-Integrated Filing- Financials-TESTCO-08-Oct-2026.csv"
     p.write_text(IHEAD + "".join(IROW.format(**({"sym": "TESTCO", "sub": "Original", "basis": "Consolidated",
                                                   "file": "INTEGRATED_FILING_INDAS_1_17042025113633_WEB.xml",
-                                                  "rev": "", "rem": ""} | r)) for r in rows), encoding="utf-8")
+                                                  "rev": "", "rem": "", "bc": "17-Apr-2025 23:30:35"} | r)) for r in rows),
+                 encoding="utf-8")
     return p
 
 
@@ -106,6 +107,13 @@ def test_revised_submission_is_never_public_before_the_revision(tmp_path):
     assert f.disseminated_at == datetime(2025, 5, 2, 10, 0, tzinfo=IST)
     with pytest.raises(L.ListingError, match="without REVISED"):
         L.parse(integrated(tmp_path, {"sub": "Revised"}))
+
+
+def test_all_company_exports_leave_broadcast_blank_on_revisions(tmp_path):
+    f = L.parse(integrated(tmp_path, {"sub": "Revision", "bc": "", "rev": "02-May-2025 10:00:00", "rem": "x"}))[0]
+    assert f.received_at == f.disseminated_at == datetime(2025, 5, 2, 10, 0, tzinfo=IST)   # public from the revision
+    with pytest.raises(L.ListingError, match="original submission without BROADCAST"):
+        L.parse(integrated(tmp_path, {"bc": ""}))
 
 
 def test_integrated_rows_for_another_symbol_are_rejected(tmp_path):

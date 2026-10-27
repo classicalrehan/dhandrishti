@@ -33,7 +33,7 @@ from ..availability import IST, statutory_deadline
 HEADER = ["COMPANY NAME", "AUDITED / UNAUDITED", "CUMULATIVE / NON-CUMULATIVE", "CONSOLIDATED / NON-CONSOLIDATED",
           "IND AS/ NON IND AS", "PERIOD", "PERIOD ENDED", "RELATING TO", "** XBRL", "Exchange Received Time",
           "Exchange Dissemination Time", "Time Taken"]
-FILE_NAME = re.compile(r"^CF-FR-equities-(.+)-(\d{2}-\d{2}-\d{4})-to-(\d{2}-\d{2}-\d{4})\.csv$")
+FILE_NAME = re.compile(r"^CF-FR-equities-(.+)-(\d{2}-\d{2}-\d{4})-to-(\d{2}-\d{2}-\d{4})(?: ?\(\d+\))?\.csv$")  # "(1)": repeat download
 INTEGRATED_HEADER = ["SYMBOL", "COMPANY NAME", "QUARTER END DATE", "TYPE OF SUBMISSION", "AUDITED / UNAUDITED",
                      "CONSOLIDATED / STANDALONE", "DETAILS", "XBRL", "BROADCAST DATE/TIME", "REVISED DATE/TIME",
                      "REVISION REMARKS", "EXCHANGE DISSEMINATION TIME", "TIME TAKEN"]
@@ -147,11 +147,15 @@ def _parse_integrated(path: Path, rows: list[list[str]], symbol: str | None) -> 
             if not name.endswith(".xml"):
                 raise ValueError(f"XBRL link {url!r}")
             end = datetime.strptime(d["QUARTER END DATE"], "%d-%b-%Y").date()
-            received, disseminated = _ts(d["BROADCAST DATE/TIME"]), _ts(d["EXCHANGE DISSEMINATION TIME"])
             revised = _ts(d["REVISED DATE/TIME"]) if d["REVISED DATE/TIME"] else None
             original = d["TYPE OF SUBMISSION"].lower() == "original"
             if not original and revised is None:
                 raise ValueError("revised submission without REVISED DATE/TIME")
+            if not d["BROADCAST DATE/TIME"] and original:
+                raise ValueError("original submission without BROADCAST DATE/TIME")
+            # All-company exports leave BROADCAST blank on revision rows; the revision was submitted at REVISED.
+            received = _ts(d["BROADCAST DATE/TIME"]) if d["BROADCAST DATE/TIME"] else revised
+            disseminated = _ts(d["EXCHANGE DISSEMINATION TIME"])
             if revised is not None and revised > disseminated:
                 disseminated = revised  # never treat a revision as public before it was made
             if disseminated < received:

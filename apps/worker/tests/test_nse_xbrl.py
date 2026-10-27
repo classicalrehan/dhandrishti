@@ -11,7 +11,7 @@ import pytest
 from psycopg.conninfo import make_conninfo
 
 from dhandrishti.db.migrate import migrate
-from dhandrishti.pit import store
+from dhandrishti.pit import controls, store
 from dhandrishti.pit.adapters import nse_results_listing as L
 from dhandrishti.pit.adapters import nse_xbrl as X
 from dhandrishti.pit.availability import IST, decision_time
@@ -79,7 +79,7 @@ def test_extracts_canonical_crore_values_with_the_listing_timestamp(tmp_path):
     assert o.available_at == o.reported_at == datetime(2026, 4, 23, 21, 1, 54, tzinfo=IST)
     assert (o.availability_basis, o.value_vintage, o.basis) == ("EXCHANGE_TIMESTAMP", "AS_REPORTED", "CONSOLIDATED")
     assert any("skipped period" in n for n in pf.notes)
-    assert all(status == "PASS" for _, status, _ in pf.checks), pf.checks
+    assert all(status in ("PASS", "N/A") for _, status, _ in pf.checks), pf.checks
 
 
 def test_consolidated_profit_without_owners_share_is_not_stored(tmp_path):
@@ -204,7 +204,7 @@ def test_bank_mapping_uses_bank_concepts(tmp_path):
     assert got[("net_profit", "Q")] == 50 and got[("total_equity", "INSTANT")] == 500
     assert got[("total_borrowings", "INSTANT")] == 500 and got[("cash_and_equivalents", "INSTANT")] == 200  # no deposits
     assert ("profit_before_exceptional_items", "Q") not in got and ("depreciation", "Q") not in got
-    assert all(st == "PASS" for _, st, _ in pf.checks), pf.checks
+    assert all(st in ("PASS", "N/A") for _, st, _ in pf.checks), pf.checks
 
 
 def test_minority_interest_tagged_as_exceptional_item_is_caught_by_cross_checks(tmp_path):
@@ -256,3 +256,59 @@ def test_stated_period_overrides_a_wrong_context_header(tmp_path):
     pf = X.parse(p, filing())
     assert {(o.metric, o.period_type): o.value for o in pf.observations}[("revenue", "Q")] == 1000  # not the 9M figure
     assert any("header says 2026-01-01..2026-03-31, filing states 2025-07-01..2026-03-31" in n for n in pf.notes)
+
+
+def test_conflicting_duplicate_values_are_noted_and_not_used(tmp_path):
+    """INFY Sep-2024 files tag opening and closing cash with the same context: neither value may be picked."""
+    extra = (fact("CashAndCashEquivalentsCashFlowStatement", "OneD", str(int(300 * 1e7)))
+             + fact("CashAndCashEquivalentsCashFlowStatement", "OneD", str(int(400 * 1e7)))
+             + fact("FinanceCosts", "OneD", str(int(10 * 1e7))))           # identical duplicate: still fine
+    pf = X.parse(xbrl(tmp_path, extra=extra), filing())
+    assert any("CashAndCashEquivalentsCashFlowStatement has two different values" in n and "300 and 400" in n
+               for n in pf.notes)
+    got = {(o.metric, o.period_type): o.value for o in pf.observations}
+    assert got[("finance_costs", "Q")] == 10 and got[("revenue", "Q")] == 1000
+    assert ("MS-1", "NOTE") in {(f.code, f.severity) for f in controls.flags_from_checks(pf.checks, pf.notes)}
+
+
+def test_nbfc_format_reuses_ind_as_elements_with_nbfc_borrowings(tmp_path):
+    cr = lambda v: str(int(v * 1e7))  # noqa: E731
+    extra = "".join(fact(n, "OneI", cr(v)) for n, v in [("DebtSecurities", 700), ("SubordinatedLiabilities", 50),
+                                                     ("Borrowings", 250), ("Deposits", 900)])
+    name = "INTEGRATED_FILING_NBFC_INDAS_9_x_WEB.xml"
+    pf = X.parse(xbrl(tmp_path, name=name, extra=extra), filing(name=name, taxonomy="NBFC"))
+    got = {(o.metric, o.period_type): o.value for o in pf.observations}
+    assert got[("revenue", "Q")] == 1000 and got[("net_profit", "Q")] == 140
+    assert got[("total_borrowings", "INSTANT")] == 1000          # 700 + 250 + 50; deposits excluded
+    prov = dict(zip(((o.metric, o.period_type) for o in pf.observations), pf.provenance))
+    assert "deposits excluded" in prov[("total_borrowings", "INSTANT")].mapping_note
+    assert all(c[1] in ("PASS", "N/A") for c in pf.checks)
+
+
+def li_xbrl(tmp_path, pat=90.0, name="INTEGRATED_FILING_LI_9_x_WEB.xml"):
+    cr = lambda v: str(int(v * 1e7))  # noqa: E731
+    body = "".join(fact(n, "OneD", cr(v)) for n, v in [("NetPremiumIncome", 1000), ("Income", 700),
+                    ("ProfitLossBeforeTax", 100), ("CurrentTaxes", 10), ("ProfitLossAfterTaxAndExtraordinaryItems", pat)])
+    body += fact("BasicAndDilutedEPSAfterExtraordinaryItemsNetOfTaxExpenseForThePeriodNotToBeAnnualized", "OneD", "0.9",
+                 "INRPerShare")
+    body += "".join(fact(n, "OneI", cr(v)) for n, v in [("ShareholdersFunds", 500), ("Borrowings", 0),
+                    ("CashAndBankBalances", 40), ("SourcesOfFunds", 6000), ("ApplicationOfFunds", 6000)])
+    body += "".join(fact(n, "OneD", v, None) for n, v in [("Symbol", "TESTCO"), ("NatureOfReportStandaloneConsolidated",
+                    "Standalone"), ("DateOfEndOfReportingPeriod", "2026-03-31"), ("DateOfEndOfBoardMeeting", "2026-04-23")])
+    p = tmp_path / name
+    p.write_text(f'<?xml version="1.0" encoding="UTF-8"?><xbrli:xbrl {NS}>' + ctx("OneD", "2026-01-01") + ctx("OneI")
+                 + body + "</xbrli:xbrl>")
+    return p
+
+
+def test_life_insurer_format(tmp_path):
+    name = "INTEGRATED_FILING_LI_9_x_WEB.xml"
+    f = filing(name=name, basis="STANDALONE", taxonomy="LI")
+    pf = X.parse(li_xbrl(tmp_path), f)
+    got = {(o.metric, o.period_type): o.value for o in pf.observations}
+    assert got[("revenue", "Q")] == 1000                       # net premium, not total income (700)
+    assert got[("net_profit", "Q")] == 90 and got[("eps_basic", "Q")] == got[("eps_diluted", "Q")] == 0.9
+    assert got[("total_equity", "INSTANT")] == 500 and got[("total_assets", "INSTANT")] == 6000
+    assert all(c[1] == "PASS" for c in pf.checks)
+    bad = X.parse(li_xbrl(tmp_path, pat=80.0), f)             # PAT no longer equals PBT - taxes
+    assert any(fl.severity == "BLOCK" for fl in controls.flags_from_checks(bad.checks, bad.notes))

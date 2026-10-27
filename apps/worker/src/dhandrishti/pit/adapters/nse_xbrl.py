@@ -26,10 +26,11 @@ EPS and segment cross-checks reveal it; such filings WARN and need review before
 
 import xml.etree.ElementTree as ET
 from collections import defaultdict
-from dataclasses import dataclass
+from dataclasses import dataclass, field
 from datetime import date
 from pathlib import Path
 
+from ..controls import Provenance
 from ..store import Observation
 from .nse_results_listing import ResultFiling
 
@@ -89,9 +90,51 @@ BANK_INSTANTS = {
 BANK_LIABILITY_LINES = ("Capital", "ReservesAndSurplus", "Deposits", "Borrowings", "OtherLiabilitiesAndProvisions")
 BANK_ASSET_LINES = ("CashAndBalancesWithReserveBankOfIndia", "BalancesWithBanksAndMoneyAtCallAndShortNotice",
                     "Investments", "Advances", "FixedAssets", "OtherAssets")
+# NBFC taxonomy (Ind-AS for NBFCs): the Ind-AS statement elements, but the balance sheet has no current/non-current
+# split and debt is filed as separate lines. Public deposits are kept out of borrowings, as for banks.
+NBFC_INSTANTS = {**INSTANTS,
+                 "total_borrowings": (("DebtSecurities", "Borrowings", "SubordinatedLiabilities"), "sum")}
+# Life-insurance taxonomy (IRDAI formats): revenue account (policyholders) and profit and loss account
+# (shareholders). Investment income swings with markets, so revenue = net premium income.
+LI_EPS = "BasicAndDilutedEPSAfterExtraordinaryItemsNetOfTaxExpenseForThePeriodNotToBeAnnualized"
+LI_FLOWS = {
+    "revenue": (("NetPremiumIncome",), "first"),
+    "profit_before_tax": (("ProfitLossBeforeTax",), "first"),
+    "eps_basic": ((LI_EPS,), "first"),
+    "eps_diluted": ((LI_EPS,), "first"),
+}
+LI_CASHFLOWS = {"cash_from_operations": (("CashFlowsFromUsedInOperatingActivities",), "first")}
+LI_INSTANTS = {
+    "total_equity": (("ShareholdersFunds",), "first"),
+    "total_borrowings": (("Borrowings",), "first"),
+    "cash_and_equivalents": (("CashAndBankBalances",), "first"),
+    "total_assets": (("ApplicationOfFunds",), "first"),
+}
+MAPPING_NOTES = {
+    "LI": {
+        "revenue": "life insurer revenue = net premium income (investment income excluded)",
+        "eps_basic": "insurer files one basic-and-diluted EPS",
+        "eps_diluted": "insurer files one basic-and-diluted EPS",
+        "total_equity": "life insurer equity = shareholders' funds",
+        "cash_and_equivalents": "life insurer cash = cash and bank balances",
+        "total_assets": "life insurer total = application of funds (balance-sheet total)",
+    },
+    "NBFC": {
+        "total_borrowings": "NBFC borrowings = debt securities + borrowings + subordinated liabilities (deposits excluded)",
+    },
+    "BANKING": {
+        "revenue": "bank revenue = total income (interest earned + other income)",
+        "finance_costs": "bank finance costs = interest expended",
+        "total_equity": "bank equity = capital + reserves and surplus (ESOPs outstanding excluded)",
+        "total_borrowings": "borrowings exclude deposits",
+        "cash_and_equivalents": "cash and balances with RBI + balances with banks and money at call",
+    },
+}
 MAPS = {
     "INDAS": (FLOWS, OWNERS_PROFIT, "ProfitLossForPeriod", CASHFLOWS, INSTANTS),
     "BANKING": (BANK_FLOWS, BANK_OWNERS_PROFIT, "ProfitLossForThePeriod", BANK_CASHFLOWS, BANK_INSTANTS),
+    "NBFC": (FLOWS, OWNERS_PROFIT, "ProfitLossForPeriod", CASHFLOWS, NBFC_INSTANTS),
+    "LI": (LI_FLOWS, (), "ProfitLossAfterTaxAndExtraordinaryItems", LI_CASHFLOWS, LI_INSTANTS),
 }
 
 
@@ -107,6 +150,8 @@ class ParsedFiling:
     observations: list[Observation]
     checks: list[tuple[str, str, str]]    # (name, PASS | FAIL | WARN | N/A, detail); only FAIL blocks an import
     notes: list[str]
+    provenance: list[Provenance] = field(default_factory=list)   # one per observation, same order
+    taxonomy: str = ""
 
 
 def _period_type(start: date, end: date) -> str | None:
@@ -163,18 +208,32 @@ def parse(path: Path, filing: ResultFiling) -> ParsedFiling:
             periods[cid] = real
 
     num: dict[tuple[str, tuple], float] = {}
+    ambiguous: set[tuple[str, tuple]] = set()  # elements filed twice with different values: never used
     text: dict[str, set[str]] = defaultdict(set)
+    qname: dict[str, str] = {}                     # local name -> prefix:name (prefix = last segment of the namespace)
+    ctx_ids: dict[tuple, list[str]] = defaultdict(list)
+    for cid, per in periods.items():
+        ctx_ids[per].append(cid)
     for e in root:
         ctx = e.get("contextRef")
         if ctx not in periods:
             continue
         name = e.tag.split("}", 1)[1]
+        qname.setdefault(name, e.tag[1:].split("}", 1)[0].rstrip("/").rsplit("/", 1)[-1] + ":" + name)
         value = (e.text or "").strip()
         if e.get("unitRef"):
             v = float(value) / (CRORE if e.get("unitRef") == "INR" else 1)
             key = (name, periods[ctx])
+            if key in ambiguous:
+                continue
             if key in num and num[key] != v:
-                raise XbrlError(f"{path.name}: {name} has two values for {periods[ctx]}")
+                # e.g. opening and closing cash both tagged with the period's context: which is which is not stated,
+                # so neither is used (values depending on it are absent) and the filing gets a note.
+                ambiguous.add(key)
+                start, end_ = periods[ctx]
+                notes.append(f"{name} has two different values for {start}..{end_} ({num.pop(key):g} and {v:g}); "
+                             "element not used")
+                continue
             num[key] = v
         else:
             text[name].add(value)
@@ -196,9 +255,17 @@ def parse(path: Path, filing: ResultFiling) -> ParsedFiling:
     if problems:
         raise XbrlError(f"{path.name} does not match its listing row: {'; '.join(problems)}")
 
-    obs = []
+    obs, prov = [], []
 
-    def emit(metric, value, unit, ptype, start, end_, note=None):
+    def provenance(used, per, derivation=None, mapping_note=None, how=None):
+        concepts = [qname.get(u, u) for u in used]
+        how = how or ("REPORTED" if len(used) == 1 and derivation is None else "SUMMED")
+        if how == "SUMMED" and derivation is None:
+            derivation = "sum: " + " + ".join(used)
+        return Provenance(how, concepts, sorted(ctx_ids.get(per, [])), derivation, mapping_note)
+
+    def emit(metric, value, unit, ptype, start, end_, p, note=None):
+        prov.append(p)
         obs.append(Observation(
             symbol=symbol, metric=metric, value=round(value, 6), unit=unit, basis=filing.basis, period_type=ptype,
             period_start=start, period_end=end_, filing_type="QUARTERLY_RESULT", reported_at=filing.disseminated_at,
@@ -206,10 +273,14 @@ def parse(path: Path, filing: ResultFiling) -> ParsedFiling:
             source=SOURCE, source_record_id=path.name + (f" ({note})" if note else "")))
 
     def pick(elements, how, per):
-        vals = [num[(el, per)] for el in elements if (el, per) in num]
-        if not vals:
-            return None
-        return vals[0] if how == "first" else sum(vals)
+        used = [el for el in elements if (el, per) in num]
+        if not used:
+            return None, []
+        if how == "first":
+            return num[(used[0], per)], used[:1]
+        return sum(num[(el, per)] for el in used), used
+
+    note_for = MAPPING_NOTES.get(filing.taxonomy, {})
 
     flow_periods = sorted({p for (_, p) in num if p[0] is not None and p[1] == end})
     for per in flow_periods:
@@ -218,36 +289,44 @@ def parse(path: Path, filing: ResultFiling) -> ParsedFiling:
             notes.append(f"skipped period {per[0]}..{per[1]} (not a quarter, half or year)")
             continue
         for metric, (els, how) in flows.items():
-            v = pick(els, how, per)
+            v, used = pick(els, how, per)
             if v is not None:
-                emit(metric, v, "INR_PER_SHARE" if metric.startswith("eps") else "INR_CR", ptype, *per)
-        owners = pick(owners_els, "first", per)
+                emit(metric, v, "INR_PER_SHARE" if metric.startswith("eps") else "INR_CR", ptype, *per,
+                     provenance(used, per, mapping_note=note_for.get(metric)))
+        owners, used = pick(owners_els, "first", per)
+        note = None
         if owners is None and filing.basis == "STANDALONE":
-            owners = pick((period_profit,), "first", per)
+            owners, used = pick((period_profit,), "first", per)
+            note = "standalone: profit for the period (no minority interest to deduct)"
         if owners is not None:
-            emit("net_profit", owners, "INR_CR", ptype, *per)
+            emit("net_profit", owners, "INR_CR", ptype, *per, provenance(used, per, mapping_note=note))
         elif (period_profit, per) in num:
             notes.append(f"net_profit not stored for {per}: consolidated profit attributable to owners not tagged")
         if ptype in ("H", "FY"):
             for metric, (els, how) in cashflows.items():
-                v = pick(els, how, per)
+                v, used = pick(els, how, per)
                 if v is not None:
-                    emit(metric, v, "INR_CR", ptype, *per)
+                    emit(metric, v, "INR_CR", ptype, *per, provenance(used, per, mapping_note=note_for.get(metric)))
     bs = (None, end)
     for metric, (els, how) in instants.items():
-        v = pick(els, how, bs)
-        if v is None and metric == "total_equity" and filing.basis == "STANDALONE" and filing.taxonomy == "INDAS":
-            v = pick(("Equity",), "first", bs)
+        v, used = pick(els, how, bs)
+        note = note_for.get(metric)
+        if v is None and metric == "total_equity" and filing.basis == "STANDALONE" and filing.taxonomy in ("INDAS", "NBFC"):
+            v, used = pick(("Equity",), "first", bs)
+            note = "standalone total equity (no non-controlling interest)"
         if v is not None:
-            emit(metric, v, "INR_CR", "INSTANT", None, end)
+            emit(metric, v, "INR_CR", "INSTANT", None, end, provenance(used, bs, mapping_note=note))
     quarter = next((p for p in flow_periods if _period_type(*p) == "Q"), None)
     paid, face = (num.get(("PaidUpValueOfEquityShareCapital", quarter)), num.get(("FaceValueOfEquityShareCapital", quarter))) if quarter else (None, None)
     if paid and face:
         emit("shares_outstanding", paid / face, "SHARES_CR", "INSTANT", None, end,
+             provenance(["PaidUpValueOfEquityShareCapital", "FaceValueOfEquityShareCapital"], quarter,
+                        derivation="PaidUpValueOfEquityShareCapital / FaceValueOfEquityShareCapital", how="CALCULATED",
+                        mapping_note="shares outstanding at period end; differs from weighted shares used for EPS"),
              "derived: paid-up equity capital / face value")
 
-    checks = (_bank_checks if filing.taxonomy == "BANKING" else _checks)(num, quarter, bs, filing, text)
-    return ParsedFiling(symbol, filing.basis, end, obs, checks, notes)
+    checks = {"BANKING": _bank_checks, "LI": _li_checks}.get(filing.taxonomy, _checks)(num, quarter, bs, filing, text)
+    return ParsedFiling(symbol, filing.basis, end, obs, checks, notes, prov, filing.taxonomy)
 
 
 def _checks(num, q, bs, filing, text) -> list[tuple[str, str, str]]:
@@ -281,6 +360,8 @@ def _checks(num, q, bs, filing, text) -> list[tuple[str, str, str]]:
             ok = abs(implied - owners) <= 0.02 * abs(owners) + 1
             out.append(("EPS x period-end shares ≈ owners' profit (2%)", "PASS" if ok else "WARN",
                         f"{implied:,.0f} vs {owners:,.0f}"))
+        out.append(_minority_as_exceptional(g("ExceptionalItemsBeforeTax"), g("ProfitOrLossAttributableToNonControllingInterests"),
+                                            None, g("ProfitBeforeTax")))
     identity("assets = equity + liabilities", g("Assets", bs), g("EquityAndLiabilities", bs))
     meeting = next(iter(text.get("DateOfEndOfBoardMeeting", [])), None)
     if meeting:
@@ -314,6 +395,9 @@ def _bank_checks(num, q, bs, filing, text) -> list[tuple[str, str, str]]:
         identity("PAT = PBT - tax", sub(g("ProfitLossFromOrdinaryActivitiesBeforeTax"), g("TaxExpense")),
                  g("ProfitLossFromOrdinaryActivitiesAfterTax"))
         seg, unalloc = g("SegmentProfitBeforeTax"), g("OtherUnallocableExpenditureNetOffUnAllocableIncome")
+        out.append(_minority_as_exceptional(g("ExceptionalItems"), g("ProfitLossOfMinorityInterest"),
+                                            seg if (unalloc or 0) == 0 else None,
+                                            g("ProfitLossFromOrdinaryActivitiesBeforeTax")))
         if seg is not None and (unalloc or 0) == 0:
             identity("segment profit before tax = PBT (cross-check)", seg, g("ProfitLossFromOrdinaryActivitiesBeforeTax"),
                      level="WARN")
@@ -326,8 +410,7 @@ def _bank_checks(num, q, bs, filing, text) -> list[tuple[str, str, str]]:
             out.append(("EPS x period-end shares ≈ owners' profit (2%)", "PASS" if ok else "WARN",
                         f"{implied:,.0f} vs {owners:,.0f}"))
     identity("assets = capital and liabilities", g("Assets", bs), g("CapitalAndLiabilities", bs))
-    # Each side must also equal the sum of its lines: HDFCBANK's consolidated 31-Mar-2026 filing has
-    # matching totals but liability lines ₹6.16 lakh crore short of the total.
+    # Each side must also equal the sum of its lines (totals can agree while lines do not).
     identity("liability lines sum to capital and liabilities",
              add(*(g(el, bs) for el in BANK_LIABILITY_LINES)), g("CapitalAndLiabilities", bs))
     identity("asset lines sum to assets", add(*(g(el, bs) for el in BANK_ASSET_LINES)), g("Assets", bs))
@@ -340,3 +423,39 @@ def _bank_checks(num, q, bs, filing, text) -> list[tuple[str, str, str]]:
         out.append(("published on/after the board meeting", "PASS" if ok else "FAIL",
                     f"meeting ended {meeting}, published {filing.disseminated_at:%Y-%m-%d %H:%M}"))
     return out
+
+
+def _li_checks(num, q, bs, filing, text) -> list[tuple[str, str, str]]:
+    """Life-insurance taxonomy: the two identities that hold in every SBILIFE filing examined (2026-10-15)."""
+    out = []
+
+    def identity(name, a, b, tol=1.0):
+        out.append((name, "N/A", "not in this filing") if a is None or b is None
+                   else (name, "PASS" if abs(a - b) <= tol else "FAIL", f"{a:,.2f} vs {b:,.2f}"))
+
+    g = lambda el, per=q: num.get((el, per))  # noqa: E731
+    if q:
+        pbt, pat = g("ProfitLossBeforeTax"), g("ProfitLossAfterTaxAndExtraordinaryItems")
+        taxes = None if g("CurrentTaxes") is None else g("CurrentTaxes") + (g("DefferedTaxes") or 0.0)
+        identity("insurer PAT = PBT - shareholders' taxes", None if pbt is None or taxes is None else pbt - taxes, pat)
+    identity("sources of funds = application of funds", g("SourcesOfFunds", bs), g("ApplicationOfFunds", bs))
+    meeting = next(iter(text.get("DateOfEndOfBoardMeeting", [])), None)
+    if meeting:
+        ok = date.fromisoformat(meeting) <= filing.disseminated_at.date()
+        out.append(("published on/after the board meeting", "PASS" if ok else "FAIL",
+                    f"meeting ended {meeting}, published {filing.disseminated_at:%Y-%m-%d %H:%M}"))
+    return out
+
+
+def _minority_as_exceptional(exceptional, minority, segment_pbt, pbt) -> tuple[str, str, str]:
+    """MI-1: an exceptional item that equals minority interest is probably minority interest tagged twice
+    (HDFC Bank consolidated, quarters ended 31-Mar-2025, 30-Sep-2025 and 31-Mar-2026, confirmed against the
+    official results). Evidence: exceptional = -minority, or minority tagged 0 and segment PBT = PBT - exceptional."""
+    name = "exceptional item looks like minority interest (MI-1)"
+    if not exceptional:
+        return (name, "N/A", "no exceptional item")
+    if minority and abs(exceptional + minority) <= 1:
+        return (name, "WARN", f"exceptional {exceptional:,.2f} = -minority interest {minority:,.2f}")
+    if not minority and segment_pbt is not None and pbt is not None and abs(segment_pbt - (pbt - exceptional)) <= 1:
+        return (name, "WARN", f"minority tagged 0; segment PBT {segment_pbt:,.2f} = PBT {pbt:,.2f} - exceptional {exceptional:,.2f}")
+    return (name, "PASS", f"exceptional {exceptional:,.2f} not explained by minority interest")

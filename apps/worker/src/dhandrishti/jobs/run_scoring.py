@@ -15,6 +15,7 @@ from ..db import connect
 from ..db import score_repository as scores
 from ..db.market_repository import load_market
 from ..scoring import score_universe
+from ..tracking.recorder import record_if_installed
 
 log = logging.getLogger(__name__)
 
@@ -25,6 +26,7 @@ def run_scoring(conn: psycopg.Connection, as_of: str, cfg: Config | None = None,
     conn.commit()
     conn.autocommit = True  # the run row must survive a failed scoring transaction
     version = scores.register_config(conn, cfg)
+    inputs_loaded_at = conn.execute("SELECT clock_timestamp()").fetchone()[0]
     market = load_market(conn, as_of, lookback_bars)
     run_id = scores.start_run(conn, as_of, version, market.provenance)
     try:
@@ -37,6 +39,9 @@ def run_scoring(conn: psycopg.Connection, as_of: str, cfg: Config | None = None,
         scores.finish_run(conn, run_id, error=f"{type(exc).__name__}: {exc}")
         raise
     log.info("run %s scored %d stocks as of %s (%s)", run_id, len(result["stocks"]), as_of, market.provenance)
+    # Tracking record (staged migration 0010): separate transaction, skipped when the tables are absent, and
+    # never able to change or fail this run.
+    record_if_installed(conn, run_id, market, result, cfg, inputs_loaded_at, lookback_bars)
     return run_id, result
 
 

@@ -22,10 +22,11 @@ listing; without one nothing is importable.
 
 import xml.etree.ElementTree as ET
 from collections import defaultdict
-from dataclasses import dataclass
+from dataclasses import dataclass, field
 from datetime import date, datetime
 from pathlib import Path
 
+from ..controls import Provenance
 from ..store import Observation
 from .nse_xbrl import XI, XbrlError, _safe_root
 
@@ -56,19 +57,34 @@ class ShareholdingFiling:
     promoter_pledged: bool | None
     checks: list[tuple[str, str, str]]
     notes: list[str]
+    members: dict[str, str] = field(default_factory=dict)   # category -> member name actually used
+    fraction_scale: bool = True
+    pledge_concept: str = PLEDGE_FLAG
 
     def observations(self, published_at: datetime, record_id: str) -> list[Observation]:
-        def obs(metric, value):
-            return Observation(symbol=self.symbol, metric=metric, value=round(value, 6), unit="PCT", basis="STANDALONE",
-                               period_type="INSTANT", period_start=None, period_end=self.as_on,
-                               filing_type="SHAREHOLDING_PATTERN", reported_at=published_at, available_at=published_at,
-                               availability_basis="EXCHANGE_TIMESTAMP", value_vintage="AS_REPORTED", source=SOURCE,
-                               source_record_id=record_id)
-        out = [obs(m, self.pct[k]) for m, k in (("promoter_holding_pct", "promoter"), ("fii_holding_pct", "fii"),
-                                                ("dii_holding_pct", "dii")) if k in self.pct]
+        return [o for o, _ in self.observations_with_provenance(published_at, record_id)]
+
+    def observations_with_provenance(self, published_at: datetime, record_id: str) -> list[tuple[Observation, Provenance]]:
+        out = []
+        scale_note = "percent of shares on the regulatory (SCRR) basis, as filed" + (
+            "; filed as a fraction, multiplied by 100" if self.fraction_scale else "")
+        for m, k in (("promoter_holding_pct", "promoter"), ("fii_holding_pct", "fii"), ("dii_holding_pct", "dii")):
+            if k in self.pct:
+                member = self.members.get(k, CATEGORY[k] if isinstance(CATEGORY[k], str) else CATEGORY[k][0])
+                out.append((self._obs(m, self.pct[k], published_at, record_id),
+                            Provenance("REPORTED", [f"in-bse-shp:{PCT}[{member}]"], [], None, scale_note)))
         if self.promoter_pledged is False:
-            out.append(obs("promoter_pledged_pct", 0.0))
+            out.append((self._obs("promoter_pledged_pct", 0.0, published_at, record_id),
+                        Provenance("INFERRED", [f"in-bse-shp:{self.pledge_concept}"], [], "0 when the filing answers 'false'",
+                                   "the filing states no promoter shares are pledged; no pledged figure is tagged")))
         return out
+
+    def _obs(self, metric, value, published_at, record_id):
+        return Observation(symbol=self.symbol, metric=metric, value=round(value, 6), unit="PCT", basis="STANDALONE",
+                           period_type="INSTANT", period_start=None, period_end=self.as_on,
+                           filing_type="SHAREHOLDING_PATTERN", reported_at=published_at, available_at=published_at,
+                           availability_basis="EXCHANGE_TIMESTAMP", value_vintage="AS_REPORTED", source=SOURCE,
+                           source_record_id=record_id)
 
 
 def parse(path: Path) -> ShareholdingFiling:
@@ -120,12 +136,19 @@ def parse(path: Path) -> ShareholdingFiling:
     if entity_symbols and entity_symbols != {symbol}:
         raise XbrlError(f"{path.name}: symbol {symbol} but context identifiers say {sorted(entity_symbols)}")
     as_on = date.fromisoformat(one("DateOfReport"))
-    flag = next((next(iter(plain_text[f])) for f in PLEDGE_FLAGS if len(plain_text.get(f, ())) == 1), None)
+    flag_name = next((f for f in PLEDGE_FLAGS if len(plain_text.get(f, ())) == 1), PLEDGE_FLAG)
+    flag = next(iter(plain_text[flag_name])) if len(plain_text.get(flag_name, ())) == 1 else None
     pledged = {"false": False, "true": True}.get(flag)
+
+    used_members: dict[str, str] = {}
 
     def member(k):
         names = CATEGORY[k] if isinstance(CATEGORY[k], tuple) else (CATEGORY[k],)
-        return next((by_member[n] for n in names if by_member.get(n)), {})
+        for n in names:
+            if by_member.get(n):
+                used_members[k] = n
+                return by_member[n]
+        return {}
 
     raw_pct = {k: member(k)[PCT] for k in CATEGORY if PCT in member(k)}
     shares = {k: member(k)[SHARES] for k in CATEGORY if SHARES in member(k)}
@@ -158,4 +181,4 @@ def parse(path: Path) -> ShareholdingFiling:
     if pledged is not False:
         checks.append(("promoter pledge stated", "WARN",
                        f"pledge flag is {flag!r}: the pledged share is not read yet (needs a sample with pledges)"))
-    return ShareholdingFiling(symbol, as_on, pct, shares, pledged, checks, notes)
+    return ShareholdingFiling(symbol, as_on, pct, shares, pledged, checks, notes, used_members, scale == 100.0, flag_name)

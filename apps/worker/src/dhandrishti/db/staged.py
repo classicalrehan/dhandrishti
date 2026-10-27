@@ -5,6 +5,8 @@ Files in packages/database/migrations-staged/ are never applied by `migrate()` (
 staged migration means moving it into migrations/ after review.
 """
 
+from collections.abc import Collection
+
 import psycopg
 
 from ..paths import STAGED_MIGRATIONS_DIR
@@ -17,10 +19,11 @@ class ProtectedDatabaseError(RuntimeError):
     pass
 
 
-def apply_staged(conn: psycopg.Connection) -> list[str]:
+def apply_staged(conn: psycopg.Connection, only: Collection[str] | None = None) -> list[str]:
+    """Normal migrations, then the staged ones (all of them, or just the file names in `only`)."""
     name = conn.info.dbname
     if name in PROTECTED_DATABASES or not name.startswith("dd_"):
         raise ProtectedDatabaseError(
             f"refusing to apply staged migrations to database {name!r}: only throwaway test databases (dd_*) allowed")
     migrate(conn)  # the normal migrations first, in order
-    return migrate(conn, STAGED_MIGRATIONS_DIR)
+    return migrate(conn, STAGED_MIGRATIONS_DIR, only)
