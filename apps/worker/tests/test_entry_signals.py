@@ -104,3 +104,40 @@ def test_summary_clusters_by_date_and_verdicts_need_both_later_periods():
     all_a = next(r for r in rows if r["strategy"] == "a" and r["period"] == "all")
     assert all_a["events"] == 36 and all_a["dates"] == 36
     assert "| a | 20 | all | 36 |" in E.markdown(rows, res)
+
+
+def test_point_in_time_universe_limits_signals_and_control_to_members_on_the_signal_day():
+    n = 30
+    d = _dates(n)
+    up = _bars(np.linspace(100, 129, n), dates=d)
+    down = _bars(np.linspace(100, 71, n), dates=d)
+    flat = _bars(np.full(n, 50.0), dates=d)
+    nifty = _bars(np.full(n, 1000.0), dates=d)
+
+    def fire(b):
+        m = np.zeros(len(b.dates), bool)
+        m[[3, 5]] = True
+        return {"test": m}
+
+    def members(day):                         # DOWN joins on day 5; before day 3 nothing is known
+        if day < d[3]:
+            return None
+        return frozenset({"UP", "FLAT"} | ({"DOWN"} if day >= d[5] else set()))
+
+    res = E.run(_history({"UP": up, "DOWN": down, "FLAT": flat}, nifty), horizons=(5,), signal_fn=fire,
+                members=members)
+    ev = {(e.symbol, e.signal_date): e for e in res.events}
+    assert ("DOWN", d[3]) not in ev and ("DOWN", d[5]) in ev and res.excluded["not_a_member"] == 1
+    on3 = np.mean([up.open[9] / up.open[4] - 1, 0.0])                       # control on day 3: UP and FLAT only
+    assert ev[("UP", d[3])].excess == pytest.approx(ev[("UP", d[3])].gross - on3)
+    on5 = np.mean([up.open[11] / up.open[6] - 1, down.open[11] / down.open[6] - 1, 0.0])
+    assert ev[("UP", d[5])].excess == pytest.approx(ev[("UP", d[5])].gross - on5)
+    plain = E.run(_history({"UP": up, "DOWN": down, "FLAT": flat}, nifty), horizons=(5,), signal_fn=fire)
+    assert len(plain.events) == 6 and "not_a_member" not in plain.excluded    # unchanged without a universe
+
+
+def test_verdict_uses_the_given_later_periods():
+    rows = [{"strategy": "a", "horizon": 20, "period": p, "events": 9, "t_nw": 2.5, "mean_excess": 0.01}
+            for p in ("2021-2022", "2023-2026")]
+    assert E.verdict(rows, ("2021-2022", "2023-2026"), "pit")[("a", 20)] == "CANDIDATE (consistent positive excess; pit)"
+    assert E.verdict(rows)[("a", 20)] == "NO DEMONSTRATED EDGE"               # default periods absent

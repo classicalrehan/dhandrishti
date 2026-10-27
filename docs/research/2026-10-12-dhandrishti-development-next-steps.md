@@ -303,9 +303,9 @@ No company is onboarded until its files are imported and checked.
 Still incomplete: 18 companies; 540 INFY/HDFCBANK values unverified (the 8 results PDFs of section 3e can come in any
 later session); insurance/NBFC mappings; flag-disposition and promotion decisions (section 6); uncommitted work.
 
-## 8. Single recommended next action (updated 2026-10-27, after section 9i)
-**Current (your decision):** either stop the notice hunt and use the verified 2021–2026 universe for the next
-study, or keep searching for the five missing pre-2021 ad hoc notices (section 9i). Recommended: stop here.
+## 8. Single recommended next action (updated 2026-10-27, after section 9j)
+**Current:** decide the next research direction (section 9j): technical entry timing showed no edge on the
+survivorship-free universe.
 The text below is the original 2026-10-15 action, already completed (9a).
 
 **Save two NSE Indices press releases from your browser into `~/Downloads`** (open each link, then save the PDF):
@@ -579,3 +579,58 @@ Notices saved so far per year: 2026: 21, 2025: 48, 2024: 64, 2023: 27, 2022: 31,
 
   The site's year lists show few notices before 2020, and web search finds individual PDFs only by luck.
   **Verified coverage stays at 1-Jan-2021 onward.**
+
+### 9j. Entry-signal study re-run on the point-in-time universe (2026-10-27)
+You decided to stop the notice hunt and use the verified 2021–2026 membership.
+- **Price gap found first.** The price database holds today's 200 members only: 98 of the 99 stocks that were
+  members during 2021–2026 and have since left had no prices, which is 19.4% of member-days.
+  - New job `jobs/former_member_prices.py` fetches them once from Kite. It uses the existing read-only client
+    and your session; market data only.
+  - Output goes to CSV files under the gitignored `data/kite-backfill/`, with `manifest.json` recording
+    symbol, token, range and status. **No database is written.**
+  - Kite lists three under later symbols: AMARAJABAT → ARE&M, IBULHSGFIN → SAMMAANCAP and
+    MOTHERSUMI → MOTHERSON.
+  - A series is accepted only if its history starts by the stock's first member day.
+  - **Result:** 86 fetched. **97.6% of member-days are now priced.** Still unpriced, because Kite no longer
+    lists them: HDFC, MINDTREE, TATAMTRDVR, ISEC, ICICIPRULI, PEL, GSPL, GUJGASLTD, RAJESHEXPO, DHANI and
+    FRETAIL.
+- **Membership defect found by a new control.** No stock can be a member before its first trading day.
+  - SONACOMS is rebuilt as a member from 1-Jan-2021 but listed on 24-Jun-2021, so its NIFTY 200 inclusion
+    notice is missing. Every period has exactly 200 members, so the same notice also excluded an unknown
+    stock.
+  - The 2021–2026 membership is therefore correct **except one unknown swap** (one of 200 slots, at some point
+    between Jun-2021 and Feb-2026).
+  - SONACOMS is left out of the study (`pit_universe.UNCERTAIN`). The job stops if any other listing-date
+    conflict appears; none does.
+- **Implemented:**
+  - `research/pit_universe.py`: verified membership, listing-date control, coverage in member-days, backfill
+    files.
+  - `entry_signals.run(..., members=...)`: a signal counts only if the stock is a member on the signal day, and
+    the same-date control is that day's members.
+  - `verdict(...)` takes the later periods as a parameter.
+  - `jobs/entry_study.py --pit`.
+- **Pre-registered rule, unchanged:** same signals, costs (15/13.5 bps; +10 bps stress) and clustering. An edge
+  needs positive excess with t ≥ 2 in **both 2021–22 and 2023–26**.
+- **Result: NO DEMONSTRATED EDGE for all 9 strategy/horizon combinations.** It is the same conclusion as the
+  survivorship-biased study (3h). Excess vs the member universe ("all" period, 2021–2026):
+
+  | Strategy | 5 sessions | 20 sessions | 60 sessions |
+  |---|---:|---:|---:|
+  | breakout | −0.07% (t −0.6) | +0.09% (t +0.4) | +0.09% (t +0.2) |
+  | continuation | −0.13% (t −1.6) | −0.08% (t −0.4) | −0.17% (t −0.4) |
+  | pullback | −0.10% (t −0.8) | −0.51% (t −2.0) | −0.73% (t −1.3) |
+
+  - 3,399, 4,580 and 2,297 events (breakout, continuation, pullback).
+  - Excluded: 11,448 event-horizons where the stock was not a member, 30,828 before 2021 (membership
+    unknown), 472 beyond the data, 3 suspect price jumps.
+  - **Pullback at 20 sessions is significantly worse than the universe in 2021–22** (−0.66%, t −2.2), but not in
+    2023–26 (t −1.2). That does not meet the "negative" rule (both periods), so it is reported but not acted on.
+  - Raw net returns are positive (for example breakout 60 sessions: +4.4%) only because the market rose; the
+    universe rose equally.
+- **What this means:** simple technical entry timing does not beat owning the NIFTY 200 members. This holds on
+  a survivorship-free universe too, so the earlier conclusion was not an artefact of the bias.
+- Reproduce: `uv run python -m dhandrishti.jobs.former_member_prices`, then
+  `uv run python -m dhandrishti.jobs.entry_study --pit`. Each needs the dev database (read-only); the first also
+  needs a Kite session.
+- Tests: `tests/test_pit_universe.py` (3, new) and `tests/test_entry_signals.py` (7: 2 new, membership filter
+  and control, verdict periods).
