@@ -182,3 +182,47 @@ def test_min_history_skips_recent_listings():
 def test_invalid_rule_settings_are_rejected(kw):
     with pytest.raises(ValueError):
         PaperParams(top_n=2, rank_buffer=2, **kw).validate()
+
+
+# ------------------------------------------------------------------ risk policy (research 9o): exposure and brake
+
+def policy(**kw):
+    base = {"capital": 100_000, "top_n": 2, "rank_buffer": 4, "stop_loss_pct": None, "kill_switch_pct": 20,
+            "exposure_pct": 50, "brake_dd_pct": 10}
+    return new_state(PaperParams(**(base | kw)))
+
+
+def test_exposure_sizes_each_slot_and_keeps_the_rest_in_cash():
+    s = policy()
+    orders, _ = plan_rebalance(s, "d0", ranked("A", "B"), {"A": 100.0, "B": 100.0}, "INITIAL")
+    assert [(o.symbol, o.qty) for o in orders] == [("A", 249), ("B", 249)]   # 50% of ₹1L over 2 slots, whole shares
+    assert sum(o.qty * 100 for o in orders) <= 50_000
+
+
+def test_brake_trims_holdings_after_a_10pct_drawdown_and_tops_up_after_recovery():
+    s = policy()
+    s.pending, _ = plan_rebalance(s, "d0", ranked("A", "B"), {"A": 100.0, "B": 100.0}, "INITIAL")
+    s.last_processed = "d0"
+    process_day(s, "d1", {"A": 100.0, "B": 100.0}, {"A": 100.0, "B": 100.0}, None)
+    assert s.positions["A"].qty == 249 and not s.braked
+    r = process_day(s, "d2", {}, {"A": 75.0, "B": 75.0}, None)                # stocks -25%: equity about -12.5%
+    assert s.braked and r.events[0].startswith("brake on:")
+    assert sorted((o.side, o.symbol, o.qty, o.reason) for o in r.created) == [
+        ("SELL", "A", 124, "REBALANCE"), ("SELL", "B", 124, "REBALANCE")]       # keep half (125 of 249)
+    assert all(o.note.startswith("brake:") for o in r.created)
+    r = process_day(s, "d3", {"A": 75.0, "B": 75.0}, {"A": 75.0, "B": 75.0}, None)
+    assert s.positions["A"].qty == 125 and r.created == []                     # still braked: no new orders
+    rebal, _ = plan_rebalance(s, "d3", ranked("C", "D"), {"C": 10.0, "D": 10.0})
+    assert all(o.qty * 10 <= s.params.slot_value(r.equity, braked=True) for o in rebal if o.side == "BUY")
+    s.peak_equity = r.equity                                                   # e.g. after a resume: no drawdown
+    r = process_day(s, "d4", {}, {"A": 75.0, "B": 75.0}, None)
+    assert not s.braked and r.events[0].startswith("brake off:")
+    assert all(o.side == "BUY" and o.note == "brake: top up after recovery" for o in r.created)
+
+
+def test_policy_settings_are_validated_and_off_by_default():
+    assert PaperParams().exposure_pct is None and PaperParams().brake_dd_pct is None
+    for kw in ({"exposure_pct": 0}, {"exposure_pct": 120}, {"brake_dd_pct": 25}, {"brake_dd_pct": 10, "brake_factor": 1},
+               {"brake_dd_pct": 10, "brake_recover_pct": 12}):
+        with pytest.raises(ValueError):
+            PaperParams(**({"kill_switch_pct": 20} | kw)).validate()

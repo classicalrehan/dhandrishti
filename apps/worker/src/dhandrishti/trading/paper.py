@@ -6,6 +6,9 @@ Day D (processed after D's close, once D's EOD candles exist):
   3. Kill switch: drawdown beyond the limit -> sell everything next open, stop buying (HALTED).
   4. Stop-losses: a close at or below entry x (1 - stop%), or below the highest close since entry
      x (1 - trailing%) -> sell next open.
+  4b. Drawdown brake (optional): drawdown at or beyond `brake_dd_pct` -> trim every holding to `brake_factor`
+     of its size at the next open; once drawdown recovers to less than `brake_recover_pct`, top holdings back up
+     to their full slot. Logged as "brake on:" / "brake off:" events, from which the state is restored on load.
   5. Rebalance (on signal days, or at creation): keep holdings still ranked within
      `rank_buffer`, fill empty slots with the best-ranked eligible stocks not held. With
      `regime_slots`, the market regime on the signal day caps the number of holdings (the rest is
@@ -14,7 +17,8 @@ New orders are created on D and can only fill on a later day: no look-ahead.
 
 Realism: whole shares; Zerodha delivery charges (trading.costs); a buy shrinks to what cash
 can pay for at the actual open (gaps happen); missing prices delay a fill (up to 3 sessions).
-Existing holdings are not resized at rebalance (fewer trades, lower charges).
+Existing holdings are not resized at rebalance (fewer trades, lower charges). With `exposure_pct`, each slot
+is sized at equity x exposure / top_n, so the rest of the capital stays in cash (risk policy, research 9o).
 """
 
 import math
@@ -44,6 +48,10 @@ class PaperParams:
     regime_slots: dict[str, int] | None = None  # max holdings per regime, e.g. {"BEARISH": 0, "CAUTIOUS": 3}
     min_history_bars: int | None = None  # skip stocks with less price history (recent listings)
     trailing_stop_pct: float | None = None  # sell on a close this far below the highest close since entry
+    exposure_pct: float | None = None  # share of equity invested; each slot = equity x exposure / top_n
+    brake_dd_pct: float | None = None  # drawdown that trims holdings to brake_factor (e.g. 10)
+    brake_factor: float = 0.5
+    brake_recover_pct: float = 5.0  # brake released once drawdown is smaller than this
 
     def validate(self) -> None:
         if self.capital <= 0 or self.top_n < 1:
@@ -64,6 +72,13 @@ class PaperParams:
             raise ValueError("trailing_stop_pct must be between 0 and 100")
         if self.min_history_bars is not None and not 0 < self.min_history_bars <= self.lookback_bars:
             raise ValueError("min_history_bars must be between 1 and lookback_bars")
+        if self.exposure_pct is not None and not 0 < self.exposure_pct <= 100:
+            raise ValueError("exposure_pct must be between 0 and 100")
+        if self.brake_dd_pct is not None:
+            if not 0 < self.brake_dd_pct < self.kill_switch_pct:
+                raise ValueError("brake_dd_pct must be positive and below the kill switch")
+            if not 0 < self.brake_factor < 1 or not 0 <= self.brake_recover_pct < self.brake_dd_pct:
+                raise ValueError("brake_factor must be in (0, 1) and brake_recover_pct below brake_dd_pct")
         for regime, n in (self.regime_slots or {}).items():
             if regime not in REGIMES or not 0 <= n <= self.top_n:
                 raise ValueError(f"regime_slots: {regime!r} must be one of {REGIMES} with 0..top_n holdings")
@@ -71,6 +86,12 @@ class PaperParams:
     def slots(self, regime: str | None) -> int:
         """Holdings allowed under `regime` (top_n when no rule applies)."""
         return min(self.top_n, (self.regime_slots or {}).get(regime, self.top_n)) if regime else self.top_n
+
+    def slot_value(self, equity: float, braked: bool = False) -> float | None:
+        """Target value of one holding under `exposure_pct` (None when exposure is not limited)."""
+        if self.exposure_pct is None:
+            return None
+        return equity * self.exposure_pct / 100 * (self.brake_factor if braked else 1.0) / self.top_n
 
 
 @dataclass
@@ -109,6 +130,7 @@ class PaperState:
     status: str = "ACTIVE"  # ACTIVE | HALTED | CLOSED
     halt_reason: str | None = None
     last_processed: str | None = None
+    braked: bool = False  # drawdown brake engaged (restored from the last brake event on load)
 
 
 @dataclass
@@ -210,6 +232,9 @@ def plan_rebalance(state: PaperState, day: str, ranked: list[dict], closes: dict
         # Each new holding gets an equal share of equity, so a smaller regime allowance leaves cash idle.
         equity = state.cash + sum(pos.qty * closes.get(s, pos.last_close) for s, pos in state.positions.items())
         per = min(est_cash / len(new), equity / p.top_n) if p.regime_slots else est_cash / len(new)
+        slot = p.slot_value(equity, state.braked)
+        if slot is not None:
+            per = min(per, slot)
         for sym in new:
             qty = math.floor(per / (closes[sym] * BUY_CHARGE_HEADROOM))
             if qty > 0:
@@ -276,6 +301,9 @@ def process_day(state: PaperState, day: str, opens: dict[str, float], closes: di
                 if s not in pending_sells and pos.last_close <= high * (1 - p.trailing_stop_pct / 100):
                     created.append(Order(day, "SELL", s, pos.qty, "STOP_LOSS",
                                          note=f"close ₹{pos.last_close:,.2f} ≤ {p.trailing_stop_pct:g}% below its high ₹{high:,.2f}"))
+        # 4b. Drawdown brake: trim to brake_factor on a deep drawdown, top back up after recovery.
+        if p.brake_dd_pct:
+            created += _brake(state, day, dd, events, {o.symbol for o in state.pending + created})
         # 5. Rebalance.
         if ranked is not None:
             state.pending.extend(created)
@@ -287,6 +315,32 @@ def process_day(state: PaperState, day: str, opens: dict[str, float], closes: di
     state.pending.extend(created)
     state.last_processed = day
     return DayResult(day, filled, cancelled, created, state.cash, equity - state.cash, equity, dd, events)
+
+
+def _brake(state: PaperState, day: str, dd: float, events: list[str], busy: set[str]) -> list[Order]:
+    """Brake orders use reason REBALANCE with a "brake:" note (the orders table allows no other reason)."""
+    p = state.params
+    orders: list[Order] = []
+    if not state.braked and dd <= -p.brake_dd_pct:
+        state.braked = True
+        events.append(f"brake on: drawdown {dd:.1f}% reached {p.brake_dd_pct:g}%; holdings trimmed to "
+                      f"{p.brake_factor:.0%}")
+        for s, pos in sorted(state.positions.items()):
+            qty = pos.qty - math.floor(pos.qty * p.brake_factor + 0.5)
+            if s not in busy and qty > 0:
+                orders.append(Order(day, "SELL", s, qty, "REBALANCE", note=f"brake: trim to {p.brake_factor:.0%}"))
+    elif state.braked and dd > -p.brake_recover_pct:
+        state.braked = False
+        events.append(f"brake off: drawdown {dd:.1f}% is back within {p.brake_recover_pct:g}%; holdings topped up")
+        slot = p.slot_value(equity_of(state)) or equity_of(state) / p.top_n
+        cash = state.cash
+        for s, pos in sorted(state.positions.items()):
+            qty = math.floor((slot - pos.qty * pos.last_close) / (pos.last_close * BUY_CHARGE_HEADROOM))
+            qty = min(qty, math.floor(cash / (pos.last_close * BUY_CHARGE_HEADROOM)))
+            if s not in busy and qty > 0:
+                orders.append(Order(day, "BUY", s, qty, "REBALANCE", note="brake: top up after recovery"))
+                cash -= qty * pos.last_close * BUY_CHARGE_HEADROOM
+    return orders
 
 
 def new_state(params: PaperParams) -> PaperState:

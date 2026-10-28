@@ -146,6 +146,10 @@ def main(argv: list[str] | None = None) -> int:
     c.add_argument("--min-history", type=int, default=None, help="skip stocks with fewer price bars")
     c.add_argument("--regime-slots", default=None,
                    help='max holdings per market regime, e.g. "BEARISH=0,CAUTIOUS=3"')
+    c.add_argument("--exposure", type=float, default=None, help="percent of equity invested (rest stays cash)")
+    c.add_argument("--brake", type=float, default=None, help="drawdown percent that trims holdings (e.g. 10)")
+    c.add_argument("--brake-factor", type=float, default=0.5, help="share of each holding kept while braked")
+    c.add_argument("--brake-recover", type=float, default=5.0, help="drawdown percent below which the brake releases")
     sub.add_parser("run")
     sub.add_parser("list")
     for cmd in ("resume", "close"):
@@ -164,7 +168,8 @@ def main(argv: list[str] | None = None) -> int:
                 min_confidence=args.min_confidence.upper() if args.min_confidence else None,
                 stop_loss_pct=args.stop_loss or None, rank_buffer=args.rank_buffer, kill_switch_pct=args.kill_switch,
                 trailing_stop_pct=args.trailing_stop, min_history_bars=args.min_history,
-                regime_slots=parse_regime_slots(args.regime_slots))
+                regime_slots=parse_regime_slots(args.regime_slots), exposure_pct=args.exposure,
+                brake_dd_pct=args.brake, brake_factor=args.brake_factor, brake_recover_pct=args.brake_recover)
             params.validate()
             pid = create(conn, args.name, params)
             print(f"Created paper portfolio #{pid} '{args.name}'. Initial orders fill at the next session's open "

@@ -5,7 +5,7 @@ import { LiveQuotes } from "@dd/contracts";
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 import { buildApp } from "../src/app";
 import { RedisCache } from "../src/cache/cache";
-import { loadLiveConfig } from "../src/config";
+import { loadConfig, loadLiveConfig } from "../src/config";
 import { checkSession, KiteAuthError, loadCredentials, parseInstruments, sessionExpired } from "../src/live/kite-session";
 import {
   BACKOFF_MAX_MS,
@@ -158,6 +158,12 @@ describe("kite session", () => {
     await expect(loadCredentials("/nonexistent/kite.json")).rejects.toBeInstanceOf(KiteAuthError);
     const creds = await loadCredentials(sessionFile());
     await expect(checkSession(creds, fakeFetch(() => 403).fn)).rejects.toBeInstanceOf(KiteAuthError);
+  });
+
+  it("allows the browser origin on the configured web port", () => {
+    expect(loadConfig({ DD_WEB_PORT: "3200" }).corsOrigins).toContain("http://localhost:3200");
+    expect(loadConfig({}).corsOrigins).toContain("http://localhost:3100");
+    expect(loadConfig({ DD_WEB_PORT: "3200", DD_WEB_ORIGIN: "http://x:1" }).corsOrigins).toEqual(["http://x:1"]);
   });
 
   it("reads the watchlist configuration without code changes", () => {

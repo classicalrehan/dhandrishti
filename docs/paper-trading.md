@@ -67,3 +67,22 @@ rebalance picks from the larger list. Bear this in mind when reading their first
 They are off by default. Which of them helped is in [research/2026-10-rule-study.md](research/2026-10-rule-study.md):
 portfolio #3 uses `--stop-loss 15 --rank-buffer 20 --min-history 252`. Regime caps did not help.
 Compare rules with `pnpm rule-study` (about 4 minutes).
+
+## Risk-policy options (added 2026-10-28)
+The risk policy from research section 9o (hard 20% drawdown limit) is available as two more optional rules, both off
+by default so existing portfolios are unchanged:
+- `--exposure 50`: each holding is sized at equity × 50% ÷ top-n, so about half the capital stays in cash.
+- `--brake 10`: at a 10% drawdown from the peak, every holding is trimmed to half at the next open
+  (`--brake-factor 0.5`). Once the drawdown is back within 5% (`--brake-recover 5`), holdings are topped up to their
+  full slot.
+  - Brake orders use reason `REBALANCE` with a note starting "brake:".
+  - The switch is logged as a "brake on:" or "brake off:" event, which is how the state is restored on the next
+    run; no schema change.
+
+The policy portfolio (not created yet; needs your go-ahead for `dhandrishti_kite`):
+```bash
+pnpm paper create --name "Policy: 15 stocks, 50% + brake" --capital 100000 --top-n 15 --rank-buffer 30 \
+    --rebalance quarterly --max-risk none --stop-loss 0 --kill-switch 20 --exposure 50 --brake 10
+```
+Its stocks come from the current score, which has **no proven edge**. The portfolio tests the risk rules in real
+time, not stock picking.

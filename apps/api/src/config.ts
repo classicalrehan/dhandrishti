@@ -29,13 +29,17 @@ export interface LiveConfig {
   sessionFile: string | null;
 }
 
-/** Where the web app may be opened locally: the dhandrishti.test domain, localhost, or the loopback IP. */
-const DEFAULT_WEB_ORIGINS = [
-  "https://dhandrishti.test", // via the Caddy proxy (same origin; listed for completeness)
-  "http://dhandrishti.test:3100",
-  "http://localhost:3100",
-  "http://127.0.0.1:3100",
-].join(",");
+/**
+ * Where the web app may be opened locally: the dhandrishti.test domain, localhost, or the loopback IP,
+ * on the web port (DD_WEB_PORT, default 3100; the same variable sets the Next.js port).
+ */
+const defaultWebOrigins = (port: string) =>
+  [
+    "https://dhandrishti.test", // via the Caddy proxy (same origin; listed for completeness)
+    `http://dhandrishti.test:${port}`,
+    `http://localhost:${port}`,
+    `http://127.0.0.1:${port}`,
+  ].join(",");
 
 export function loadConfig(env: NodeJS.ProcessEnv = process.env): ApiConfig {
   const redis = env.DD_REDIS_URL ?? "redis://127.0.0.1:6379/0";
@@ -49,7 +53,7 @@ export function loadConfig(env: NodeJS.ProcessEnv = process.env): ApiConfig {
     aiMode: (["auto", "on", "off"].includes(env.DD_AI ?? "") ? env.DD_AI : "auto") as ApiConfig["aiMode"],
     aiRateLimitMax: Number(env.DD_AI_RATE_LIMIT_MAX ?? 10),
     trustProxy: env.DD_TRUST_PROXY === "false" ? false : (env.DD_TRUST_PROXY ?? "loopback"),
-    corsOrigins: (env.DD_WEB_ORIGIN ?? DEFAULT_WEB_ORIGINS).split(",").map((s) => s.trim()),
+    corsOrigins: (env.DD_WEB_ORIGIN ?? defaultWebOrigins(env.DD_WEB_PORT ?? "3100")).split(",").map((s) => s.trim()),
     live: loadLiveConfig(env),
   };
 }

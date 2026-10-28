@@ -303,10 +303,10 @@ No company is onboarded until its files are imported and checked.
 Still incomplete: 18 companies; 540 INFY/HDFCBANK values unverified (the 8 results PDFs of section 3e can come in any
 later session); insurance/NBFC mappings; flag-disposition and promotion decisions (section 6); uncommitted work.
 
-## 8. Single recommended next action (updated 2026-10-27, after section 9k)
-**Current:** observe the live watchlist during one market session (section 9k: set `DD_LIVE_WATCHLIST`, run
-`pnpm kite:login` and the API, open /watchlist) to confirm FRESH ticks, reconnects and the 15:30 transition; the
-research direction after 9j is still open.
+## 8. Single recommended next action (updated 2026-10-27, after section 9p)
+**Current (your decisions, section 9p):** (1) approve creating the risk-policy paper portfolio in `dhandrishti_kite`;
+(2) choose how to get fundamentals for selection: annual-only NIFTY 200 downloads (about 1,000 files), the
+20-company pilot only, or a provider you choose.
 The text below is the original 2026-10-15 action, already completed (9a).
 
 **Save two NSE Indices press releases from your browser into `~/Downloads`** (open each link, then save the PDF):
@@ -700,7 +700,17 @@ they are not evidence of any edge (9j still holds). There is no order, GTT or tr
   - Today's stored close (27-Oct) was preferred and labelled "End of day".
   - The access token appeared 0 times in the server log or the response.
   - That run found and fixed one issue: after-close snapshots had been labelled FRESH.
-  - **Not yet observed during market hours.**
+  - **Observed during market hours (28-Oct-2026, ~12:00 IST, `pnpm dev:kite` with 5 symbols):**
+    - The feed was CONNECTED and the session OPEN, with all 5 quotes FRESH and 0 reconnects.
+    - Prices and volumes changed between readings 13 s apart (for example RELIANCE ₹1,172.60 → ₹1,172.30).
+    - `/watchlist` returned 200.
+  - **Fixes from that run:**
+    - API shutdown ran twice when turbo sent two signals ("Called end on pool more than once"); it now runs
+      once, verified with SIGINT plus SIGTERM.
+    - The web port is now `DD_WEB_PORT` (default 3100); the API's default allowed origins follow it.
+    - This Next.js version allows **one dev server per project folder**, so a second instance on another port
+      is refused; stop the first one instead.
+  - The 15:30 transition to QUIET has not been observed live yet; it is covered by tests.
 - **Tests (actual):**
   - API `vitest` with Postgres and Redis integration: **69 passed**. That includes `test/live.test.ts` (22:
     parser, session, config, connect, dedupe, mapping gaps, out-of-order, protocol error, reconnect and
@@ -715,3 +725,281 @@ they are not evidence of any edge (9j still holds). There is no order, GTT or tr
   - The watchlist is set at API start (restart to change).
   - No candles are built: no consumer needs them yet.
   - UI component rendering is not tested (no React testing library installed); the display rules are tested.
+
+### 9l. Exit-rule study: stops do not beat simple position sizing (2026-10-28)
+Question: do stop-loss, trailing, target or trend exits reduce drawdown (your 15–20% limit) or add return,
+compared with holding?
+- **Design (fixed before running; `research/exit_rules.py`, `jobs/exit_study.py`):**
+  - **Entries are neutral.** Every point-in-time NIFTY 200 member at the open after the first session of each
+    month, Jan-2021 to Jul-2026: 13,062 trades. Neutral because no entry signal has an edge (9j).
+  - **Rules, all with a 60-session maximum hold:**
+    - stop8 / stop15: −8% / −15% from entry;
+    - trail15: −15% from the highest close;
+    - atr3: highest close − 3×ATR(14);
+    - sma50: close below its 50-day average;
+    - tgt15_stop8: +15% target or −8% stop;
+    - baseline: hold 60 sessions.
+  - Triggers are checked on closes and filled at the next open, so gaps are included. Costs are 15/13.5 bps.
+    Cash after an exit earns 0.
+  - **Portfolio:** monthly cohorts, equal weight, about 3 overlapping.
+  - **Verdict rule:** max drawdown at least 3 points smaller in BOTH 2021–22 and 2023–26, without a significant
+    full-period return cost.
+- **Result (all periods):**
+
+  | Rule | Annual | Max drawdown | Mean per trade | vs hold (t) | Losses >15% | Exposure | Verdict |
+  |---|---:|---:|---:|---:|---:|---:|---|
+  | hold 60 (baseline) | +15.5% | −23.3% | +3.59% | — | 10.1% | 100% | — |
+  | stop8 | +10.2% | −20.5% | +2.43% | −1.17% (−2.8) | 1.0% | 72% | COSTS RETURN |
+  | stop15 | +13.4% | −23.0% | +3.13% | −0.46% (−3.8) | 16.8% | 91% | COSTS RETURN |
+  | trail15 | +12.0% | −21.9% | +2.81% | −0.78% (−3.4) | 9.8% | 85% | COSTS RETURN |
+  | atr3 | +9.2% | −16.0% | +2.08% | −1.51% (−2.3) | 1.3% | 54% | NO DEMONSTRATED BENEFIT |
+  | sma50 | +5.1% | −7.9% | +1.08% | −2.51% (−2.2) | 0.5% | 25% | NO DEMONSTRATED BENEFIT |
+  | tgt15_stop8 | +6.9% | −14.7% | +1.55% | −2.05% (−2.9) | 1.0% | 58% | NO DEMONSTRATED BENEFIT |
+
+  - NIFTY 50 over the same window: +8.6% a year, −17.2% max drawdown.
+  - atr3, sma50 and tgt15_stop8 did shrink drawdown by 3 points or more in both periods. Each paid a
+    significant return cost over the full period, so none passes.
+  - "Losses >15%" counts trades losing more than 15% after the gap fill. stop15 is higher than hold because
+    gaps through −15% make the realized loss worse.
+- **Supplementary check (added after seeing the results; explains them, does not change the verdicts):**
+  - Every rule's drawdown reduction comes from **time out of the market**. The baseline held at the same
+    average exposure (simple position sizing, no stops) has an equal or smaller drawdown in every case: for
+    example stop8 −20.5% vs −17.2% sized, tgt15_stop8 −14.7% vs −13.8%.
+  - Return per unit of drawdown is highest for plain holding (0.67). The rules range from 0.47 to 0.65.
+- **What this means for the Entry & Exit Engine:**
+  1. Holding the whole member universe would have **exceeded your 20% drawdown limit** (−23.3%).
+  2. The tested exits are not a better way to control that than **investing less** (keeping part of the
+     capital in cash or liquid funds). Portfolio-level exposure and position sizing are the risk lever to build
+     first, not per-stock stops.
+  3. Per-trade tails: an 8% stop does cut the share of trades losing more than 15% from 10.1% to 1.0%, at
+     −1.2% average return per trade. That may matter for a **concentrated** portfolio of 5–10 stocks (under
+     ₹1 lakh), where one large loss weighs more. It was not tested here: the study used the whole universe.
+- **Limitations:**
+  - About 5.75 years, with few independent drawdown episodes (2022, 2024–25).
+  - Neutral entries over a broad universe; a concentrated, selected portfolio may behave differently.
+  - Cash earns 0 (a liquid fund at about 6–7% would favour the cash-holding rules a little).
+  - Price returns only; dividends are excluded.
+- Tests: `tests/test_exit_rules.py` **4 passed**:
+  - triggers on closes and the first breach;
+  - next-open fills including gaps;
+  - identical trades across rules;
+  - only members traded;
+  - cash after exit with costs charged once;
+  - verdicts need both periods and no return cost.
+
+  Related suites: 23 passed in total.
+
+### 9m. Position-sizing study: exposure is the main lever, and 2021–26 understates crash risk (2026-10-28)
+Question: for a small portfolio, which number of stocks and share of capital invested keeps the maximum drawdown
+within the 15–20% limit, and does an 8% stop help when the portfolio is concentrated?
+- **Design (fixed before running; `research/position_sizing.py`, `jobs/sizing_study.py`):**
+  - **Holdings:** quarterly rebalance (23 quarters, Jan-2021 to Oct-2026). Each quarter, N stocks are drawn at
+    random from that day's NIFTY 200 members (point-in-time). Random, because no selection rule has an edge,
+    so this measures concentration and exposure risk only.
+  - **Paths:** 500 paths with the same draws for every setting (fixed seed).
+  - **Grid (96 settings):**
+    - N = 5, 10, 15, 20;
+    - invested 50–100% (the rest is cash at 0);
+    - equal or inverse-volatility weights;
+    - no stop or an 8% stop filled at the next open.
+  - **Costs:** a full round trip on the invested part each quarter.
+  - **Rule:** acceptable if at most 10% of paths are worse than −20% drawdown; recommended = the acceptable
+    setting with the highest median annual return. A stop "helps" if it cuts the paths worse than −20% by at
+    least 5 points at no more than 1 point of median return, at the same exposure.
+- **Result (2021–26, equal weights; full tables from `uv run python -m dhandrishti.jobs.sizing_study`):**
+  - **Fully invested, every N breaks −20% in 94–97% of paths.** Median max drawdown is −24.5% to −29.9%.
+  - **Largest exposure that stays acceptable:**
+
+    | N | No stop | With 8% stop |
+    |---|---|---|
+    | 5 | 50% (breach 10%; median +8.0%/yr; 5th-percentile year +2.8%) | 60% (8%; +7.9%) |
+    | 10 | 50% (1%; +7.9%) | 70% (5%; +8.7%) |
+    | 15 | 60% (2%; +9.5%) | 80% (7%; +10.3%) |
+    | 20 | 60% (1%; +9.4%) | 80% (4%; +10.3%) |
+
+  - **More stocks mainly protect the bad cases.** At 100% invested, the 5th-percentile annual return rises from
+    +4.3% (5 stocks) to +10.4% (20 stocks), and the 1-in-20 drawdown improves from −40.1% to −29.4%. The median
+    barely changes.
+  - Inverse-volatility weights were no better than equal weights.
+  - **Pre-registered outcome:**
+    - **Recommended: 20 stocks, 80% invested, equal weights, 8% stop:** median +10.3%/yr, median max drawdown
+      −16.5%, worse than −20% in 4% of paths. Its median beats the best no-stop setting (+9.5%) by less than
+      1 point/yr, within what one market history can resolve.
+    - **8% stop "helps" at the same exposure: nowhere**, because it always cost more than 1 point of return. Its
+      benefit is indirect: it allows somewhat higher exposure for the same breach risk.
+- **Supplementary stress test (added after the results; not pre-registered):**
+  - All 500 paths above share one market history (2021–26, NIFTY 50 worst fall −17.2%), so they vary the
+    stocks, not the market.
+  - The same settings were rerun on **2015–2020**, which includes the March-2020 crash (NIFTY 50 −38.4%). That
+    period uses today's NIFTY 200 list (survivorship bias, which **flatters** the result).
+  - Every setting that was acceptable in 2021–26 broke −20% in most paths:
+
+    | Setting | Paths worse than −20% | Median max drawdown |
+    |---|---:|---:|
+    | 20 stocks, 80% invested, 8% stop | 74% | −22.6% |
+    | 20 stocks, 60% invested, no stop | 100% | −26.0% |
+    | 10 stocks, 50% invested, no stop | 83% | −22.8% |
+    | 5 stocks, 60% invested, 8% stop | 56% | −20.8% |
+
+  - In the crash the stop reduced damage (74% vs 100%), unlike in 2021–26.
+- **What this means for the Entry & Exit Engine:**
+  1. A fixed exposure set on 2021–26 is **not enough** to hold a 20% limit through a 2020-style crash. A
+     **portfolio-level drawdown control** is needed: cut exposure when the portfolio falls a set amount from
+     its peak, or when the market regime turns bearish. That is the next study.
+  2. Hold **at least 10–15 stocks** where capital allows; 5 stocks roughly doubles the bad-case outcomes.
+  3. With under ₹1 lakh, 15–20 positions is about ₹4,000–6,500 each. That is feasible for most NIFTY 200 stocks,
+     though a few high-priced shares (MRF, Page Industries, Bosch and others) cannot be bought at that size.
+- **Limitations:**
+  - Random selection.
+  - One verified market history (2021–26); the crash test uses a biased universe.
+  - Cash earns 0 (a liquid fund would add about 3–4% a year on the uninvested part).
+  - Price returns only.
+  - Quarterly rebalancing with full turnover assumed.
+- Tests: `tests/test_position_sizing.py` **4 passed**:
+  - stop filled at the next open, then cash until the rebalance;
+  - exposure and costs applied to the invested part;
+  - common random draws and reproducibility;
+  - statistics and verdict rules.
+
+  `tests/test_exit_rules.py`: 4 passed.
+
+### 9n. Drawdown-control study: no tested rule holds 20% through a 2020-style crash (2026-10-28)
+Question: can a portfolio-level rule keep a small portfolio within a 20% maximum drawdown in both the verified
+period and a crash?
+- **Design (fixed before running; `research/drawdown_control.py`, `jobs/drawdown_study.py`):**
+  - Same quarterly baskets as 9m: **15 random point-in-time members** per quarter, 500 paths, the same draws for
+    every rule.
+  - The invested part drifts with prices and cash stays put; money moves only at a rebalance or when a rule
+    changes the target.
+  - Costs on every move. Cash earns 0.
+  - **Rules (base = 60/80/100% invested):**
+    - **fixed:** always the base amount;
+    - **dd_half:** half after a 10% fall from the peak, back to base once less than 5% below the peak;
+    - **dd_cash_trend:** cash after a 10% fall, back when NIFTY 50 closes above its 50-day average, with the peak
+      reset at re-entry;
+    - **trend200:** cash while NIFTY 50 is below its 200-day average;
+    - **trend200_half:** half while it is below.
+  - **Periods:** verified 2021–26 (point-in-time; NIFTY 50 worst fall −17.2%) and the crash test 2015–20
+    (today's list, survivorship-biased, flatters results; NIFTY 50 −38.4%).
+  - **Pass:** at most 10% of paths worse than −20% in BOTH periods.
+  - **Check:** "fixed" reproduces the 9m simulation exactly (tested).
+- **Result: no setting passes.**
+
+  | Rule | Base | 2021–26 median annual | 2021–26 paths worse than −20% | Crash: median max drawdown | Crash: paths worse than −20% |
+  |---|---:|---:|---:|---:|---:|
+  | fixed | 60% | +9.5% | 2% | −26.4% | 100% |
+  | fixed | 100% | +15.3% | 94% | −43.1% | 100% |
+  | **dd_half** | **60%** | **+7.5%** | **0%** | **−19.1%** | **29%** |
+  | dd_half | 80% | +10.2% | 0% | −23.2% | 96% |
+  | dd_cash_trend | 60% | +7.8% | 20% | −21.2% | 60% |
+  | trend200 | 60% | +6.6% | 11% | −24.3% | 88% |
+  | trend200_half | 60% | +8.1% | 2% | −22.2% | 68% |
+
+  Full table: `uv run python -m dhandrishti.jobs.drawdown_study`.
+- **Reading:**
+  - **dd_half is the most effective brake.** At 60% invested it held the limit in every 2021–26 path and
+    roughly halved the crash damage: median −19.1% vs −26.4% fixed. It cost about 2 points a year in
+    2021–26 (+7.5% vs +9.5%).
+  - **Trend-following rules failed in the crash.** The 2020 fall was faster than the 200-day average could
+    react, and they then missed the rebound (crash-period return about −0.4% a year).
+  - **dd_cash_trend** whipsawed in 2021–26: more breaches than doing nothing.
+- **What this means:**
+  - A hard 20% limit through a 2020-style crash (index −38%) is **not achievable with the tested rules at 60%
+    or more invested**.
+  - It needs roughly 50% or less in equities at the time of the crash, or accepting a worst case of about
+    20–25%.
+  - The closest practical design is **dd_half with a lower base**. Base exposures below 60% were not in the
+    pre-registered grid; testing them is a new, separately registered run, not a re-reading of this one.
+- **Limitations:**
+  - Random selection.
+  - One verified history.
+  - The crash test is survivorship-biased (real results would be worse).
+  - Cash earns 0 (a liquid fund would soften the cost of holding cash).
+  - Fills approximated at the decision mark.
+- Tests: `tests/test_drawdown_control.py` **5 passed**:
+  - fixed reproduces 9m;
+  - dd_half halves exposure and limits the next fall;
+  - trend rules in cash below the average;
+  - cash rule re-entry with peak reset;
+  - verdict needs both periods.
+
+  Related research suites: 23 passed in total.
+
+### 9o. Risk policy decided: 50% base exposure with the dd_half brake (2026-10-28)
+You asked for the best option within your stated limit (15–20% maximum drawdown), so the hard 20% limit (choice A
+in 9n) applies.
+- **Registered follow-up (fixed before running):**
+  - Rules fixed and dd_half at a base of 40/45/50/55% invested; everything else as 9n (15 random members,
+    500 paths, the same draws, both periods).
+  - Same pass rule and the same choice rule (highest 2021–26 median among passing settings).
+  - Run: `uv run python -m dhandrishti.jobs.drawdown_study --rules fixed,dd_half --bases 0.4,0.45,0.5,0.55`.
+
+  | Rule | Base | 2021–26 median annual | Median max drawdown | Worse than −20% | Crash: median max drawdown | Crash: worse than −20% |
+  |---|---:|---:|---:|---:|---:|---:|
+  | fixed | 40% | +6.4% | −10.7% | 0% | −17.8% | 24% |
+  | fixed | 50% | +8.0% | −13.2% | 0% | −22.1% | 82% |
+  | dd_half | 40% | +5.9% | −10.5% | 0% | −14.8% | 0% |
+  | dd_half | 45% | +6.0% | −11.2% | 0% | −16.0% | 0% |
+  | **dd_half** | **50%** | **+6.4%** | **−11.9%** | **0%** | **−17.1%** | **3%** |
+  | dd_half | 55% | +6.9% | −12.5% | 0% | −18.1% | 11% |
+
+- **Passing:** dd_half at 40%, 45% and 50%. **Recommended: dd_half at 50%.**
+- **Risk policy for the Entry & Exit Engine (to implement; nothing is live yet):**
+  1. **Normal exposure:** 50% of capital in stocks. The rest goes to cash or a liquid fund. Cash earned 0 in the
+     study; a liquid fund would add roughly 3 points a year at about 6–7% on the cash half. That is an estimate,
+     not measured.
+  2. **Brake:** when the portfolio is 10% below its peak value, cut stocks to 25% of capital. Return to 50% when
+     the portfolio is less than 5% below its peak. Decide at the close and act at the next open.
+  3. **Diversification:** at least 15 stocks, equal weight, rebalanced quarterly. With under ₹1 lakh that is
+     about ₹3,300 per stock at 50% exposure; a few very high-priced shares cannot be held at that size.
+  4. **No per-stock stops by default** (9l, 9m). An optional 8% stop gave some crash protection but cost
+     return in normal markets.
+  5. **Expected behaviour, conditional on the tested history and random selection:** about +6% a year on the
+     stock half in 2021–26-like markets, worst falls of about −12% normally and about −17% in a 2020-style crash.
+- **Caveats:**
+  - These numbers come from random stock picks; a validated selection method could change returns, but would
+    not remove crash risk.
+  - The crash test is survivorship-biased, so real crash losses would be somewhat worse.
+  - One verified history (2021–26).
+- Tests: `tests/test_drawdown_control.py` 5 passed (the follow-up only adds rule/base options to the job).
+
+### 9p. Risk policy in paper trading (built, not yet created) and the fundamentals-selection data problem (2026-10-28)
+**A. Paper trading with the risk policy:**
+- **Built:** `trading/paper.py` gained optional `exposure_pct`, `brake_dd_pct`, `brake_factor` and
+  `brake_recover_pct`.
+  - New buys are sized at equity × exposure ÷ top-n.
+  - At a 10% drawdown, holdings are trimmed to half at the next open; they are topped back up once the drawdown
+    is within 5%.
+- **No migration:**
+  - Brake orders use the allowed reason REBALANCE with a "brake:" note, because the orders table allows only four
+    reasons.
+  - The brake state is restored from the last "brake on/off" daily event (`db/paper_repository.py`).
+- **Command line:** `--exposure`, `--brake`, `--brake-factor`, `--brake-recover` on `pnpm paper create`.
+  Documented in `docs/paper-trading.md`.
+- **Existing portfolios:** all new settings default to off, so #1–#3 behave exactly as before; the 19 earlier
+  engine tests are unchanged and pass.
+- **Tests:**
+  - `tests/test_paper.py`: 22 passed (3 new: exposure sizing; brake trims at −10%, holds, and tops up after
+    recovery; validation and defaults).
+  - `tests/test_paper_db.py`: 3 passed (1 new on PostgreSQL: a policy portfolio invests at most half its capital,
+    runs, and the brake state survives a reload).
+- **Not done (needs your approval):** creating the policy portfolio in `dhandrishti_kite`. That inserts a
+  portfolio into the real database, which you had asked me not to modify. Command in `docs/paper-trading.md`:
+  15 stocks, quarterly, no risk filter, no per-stock stop, kill switch 20%, exposure 50%, brake 10%.
+  - Its stocks come from the current price-only score, which has no proven edge, so it tests the risk rules in
+    real time, not stock picking.
+
+**B. Fundamentals-based selection: blocked by data access at the needed scale.**
+- A selection study needs fundamentals for the whole point-in-time NIFTY 200 over years.
+- NSE's exports list filings with links only (checked: the Integrated Filing export has symbol, period, XBRL link
+  and broadcast time, but no figures). Every result is therefore one manual XBRL download.
+- **Volumes:**
+  - quarterly, 2021–26: about 200 × 20 = 4,000 files;
+  - annual results only (FY2021–FY2026, consolidated): about 1,000 files;
+  - the existing 20-company pilot (too few companies for a cross-sectional test).
+- **Feasible options (your decision; nothing started):**
+  1. **Annual-only for the NIFTY 200 (about 1,000 downloads).** The `todo` helper can list them from per-company
+     listing exports; spread over several weeks.
+  2. **Narrow, earlier question:** use the 20-company pilot only to check whether quality scores line up with
+     later returns. Weak evidence by construction.
+  3. **A data provider:** you would choose it; not selected or purchased here, per your instruction.

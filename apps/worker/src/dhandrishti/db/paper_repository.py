@@ -38,7 +38,20 @@ def load(conn: psycopg.Connection, pid: int) -> tuple[str, PaperState]:
             SELECT id, created_on, side, symbol, qty, reason, note, attempts FROM paper_orders
             WHERE portfolio_id = %s AND status = 'PENDING' ORDER BY id""", (pid,)):
         state.pending.append(Order(created.isoformat(), side, sym, qty, reason, note=note, attempts=attempts, id=oid))
+    state.braked = _braked(conn, pid)
     return name, state
+
+
+def _braked(conn: psycopg.Connection, pid: int) -> bool:
+    """The drawdown brake is on when the most recent brake event is "brake on:" (no column needed)."""
+    row = conn.execute("""
+        SELECT events FROM paper_daily
+        WHERE portfolio_id = %s AND events::text LIKE '%%brake o%%'
+        ORDER BY trade_date DESC LIMIT 1""", (pid,)).fetchone()
+    if row is None:
+        return False
+    last = [e for e in row[0] if e.startswith(("brake on:", "brake off:"))]
+    return bool(last) and last[-1].startswith("brake on:")
 
 
 def _upsert_orders(conn: psycopg.Connection, pid: int, orders: list[Order]) -> None:

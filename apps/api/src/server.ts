@@ -69,7 +69,11 @@ const app = await buildApp({
 warn = (obj, msg) => app.log.warn(obj, msg);
 app.log.info({ ai: aiEnabled ? "enabled" : "disabled (set ANTHROPIC_API_KEY or DD_AI=on)" }, "research assistant");
 
+// Run once: turbo/tsx can deliver SIGINT and SIGTERM together, and ending the pool twice throws.
+let shuttingDown = false;
 const shutdown = async () => {
+  if (shuttingDown) return;
+  shuttingDown = true;
   await liveService?.stop();
   await app.close();
   await pool.end();

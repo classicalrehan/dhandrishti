@@ -72,3 +72,28 @@ def test_duplicate_names_are_rejected(db):
         paper.create(conn, "dup", PaperParams(), as_of="2026-09-01")
         with pytest.raises(psycopg.errors.UniqueViolation):
             paper.create(conn, "dup", PaperParams(), as_of="2026-09-01")
+
+
+def test_policy_portfolio_runs_and_the_brake_state_survives_a_reload(db):
+    from psycopg.types.json import Jsonb
+
+    from dhandrishti.db import paper_repository as repo
+
+    with psycopg.connect(db, autocommit=True) as conn:
+        params = PaperParams(capital=100_000, top_n=4, rank_buffer=8, stop_loss_pct=None, kill_switch_pct=20,
+                             max_risk=None, rebalance="quarterly", exposure_pct=50, brake_dd_pct=10)
+        pid = paper.create(conn, "policy 50% + brake", params, as_of="2026-08-20")
+        planned = conn.execute("""SELECT sum(o.qty * p.close) FROM paper_orders o JOIN daily_prices p
+                                  ON p.symbol = o.symbol AND p.trade_date = '2026-08-20'
+                                  WHERE o.portfolio_id = %s""", (pid,)).fetchone()[0]
+        assert planned <= 50_000                                    # half the capital invested, the rest cash
+        paper.run(conn)
+        _, state = repo.load(conn, pid)
+        assert state.params.exposure_pct == 50 and not state.braked
+        last = state.last_processed
+        conn.execute("UPDATE paper_daily SET events = %s WHERE portfolio_id = %s AND trade_date = %s",
+                     (Jsonb(["brake on: drawdown -10.4% reached 10%"]), pid, last))
+        assert repo.load(conn, pid)[1].braked
+        conn.execute("UPDATE paper_daily SET events = %s WHERE portfolio_id = %s AND trade_date = %s",
+                     (Jsonb(["brake on: x", "brake off: drawdown -4.0% is back within 5%"]), pid, last))
+        assert not repo.load(conn, pid)[1].braked

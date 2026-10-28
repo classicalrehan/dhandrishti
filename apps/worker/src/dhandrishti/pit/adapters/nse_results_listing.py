@@ -87,10 +87,12 @@ def symbol_from_name(path: Path) -> str:
     return m.group(1)
 
 
-def parse(path: Path, symbol: str | None = None) -> list[ResultFiling]:
+def parse(path: Path, symbol: str | None = None, rejected: list[str] | None = None) -> list[ResultFiling]:
+    """Filings in one listing CSV. A bad row makes the whole file an error, unless `rejected` is given: then bad
+    rows are skipped and described there (all-company exports carry a few duplicate or inconsistent rows)."""
     rows = list(csv.reader(path.read_text(encoding="utf-8-sig").splitlines()))
     if rows and [c.strip() for c in rows[0]] == INTEGRATED_HEADER:
-        return _parse_integrated(path, rows, symbol)
+        return _parse_integrated(path, rows, symbol, rejected)
     symbol = symbol or symbol_from_name(path)
     if not rows or [c.strip() for c in rows[0]] != HEADER:
         raise ListingError(f"{path.name}: unexpected header {rows[0] if rows else '(empty)'}")
@@ -126,12 +128,19 @@ def parse(path: Path, symbol: str | None = None) -> list[ResultFiling]:
                 received_at=received, disseminated_at=disseminated))
         except (ValueError, KeyError) as exc:
             errors.append(f"{path.name} row {n}: {exc}")
-    if errors:
+    return _finish(out, errors, rejected)
+
+
+def _finish(out: list[ResultFiling], errors: list[str], rejected: list[str] | None) -> list[ResultFiling]:
+    if errors and rejected is None:
         raise ListingError("\n".join(errors))
+    if rejected is not None:
+        rejected.extend(errors)
     return sorted(out, key=lambda f: (f.period_end, f.basis))
 
 
-def _parse_integrated(path: Path, rows: list[list[str]], symbol: str | None) -> list[ResultFiling]:
+def _parse_integrated(path: Path, rows: list[list[str]], symbol: str | None,
+                      rejected: list[str] | None = None) -> list[ResultFiling]:
     out, errors, seen = [], [], set()
     for n, r in enumerate(rows[1:], start=2):
         if not any(c.strip() for c in r):
@@ -174,6 +183,4 @@ def _parse_integrated(path: Path, rows: list[list[str]], symbol: str | None) -> 
                 submission=d["TYPE OF SUBMISSION"], revised_at=revised, revision_remarks=d["REVISION REMARKS"] or None))
         except (ValueError, KeyError) as exc:
             errors.append(f"{path.name} row {n}: {exc}")
-    if errors:
-        raise ListingError("\n".join(errors))
-    return sorted(out, key=lambda f: (f.period_end, f.basis))
+    return _finish(out, errors, rejected)
